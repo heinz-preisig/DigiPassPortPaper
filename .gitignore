@@ -24,6 +24,8 @@ __pycache__/
 *.lof
 *.spl
 *.upa
+*.brf
+*.upb
 DPP____The_Graph_of_Passport_Model/main.pdf
 
 # OS files

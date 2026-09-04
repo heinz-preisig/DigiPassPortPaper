@@ -4,63 +4,126 @@
 
 \subsection{The ESPR Mandate and Its Architectural Implications}
 
-The Ecodesign for Sustainable Products Regulation (ESPR), which entered into force in July 2024, establishes the Digital Product Passport as \emph{''the cornerstone of the Commission's approach to more environmentally sustainable and circular products.''} The regulation requires that \DPPs\ carry product-specific data across the entire lifecycle --- from material composition and origin, through manufacturing and use, to repair, recycling, and disposal --- accessible to consumers, professional users, circular economy operators, and market surveillance authorities.
+The Ecodesign for Sustainable Products Regulation (ESPR), which entered into
+force in July 2024, establishes the Digital Product Passport as \emph{''the
+cornerstone of the Commission's approach to more environmentally sustainable and
+circular products.''} The regulation requires that \DPPs\ carry product-specific
+data across the entire lifecycle --- from material composition and origin,
+through manufacturing and use, to repair, recycling, and disposal --- accessible
+to consumers, professional users, circular economy operators, and market
+surveillance authorities.
 
-The European Commission has set February~2027 as the deadline for the first implementing acts, beginning with a central registry:
+The European Commission has set February~2027 as the deadline for the first
+implementing acts, beginning with a central registry:
 
 \begin{quote}\emph{
-''Developing the infrastructure --- the \IT\ infrastructure needed in order to make this happen in February~2027. And here, the first piece of legislation that we will adopt is the implementing act for the central registry.''
+''Developing the infrastructure --- the \IT\ infrastructure needed in order to
+make this happen in February~2027. And here, the first piece of legislation that
+we will adopt is the implementing act for the central registry.''
 }
 \end{quote}
 
-The first product-specific \DPP\ requirements target batteries under the separate Battery Regulation, with subsequent product categories --- textiles, construction products, electronics, chemicals, and others --- following progressively.
+The first product-specific \DPP\ requirements target batteries under the
+separate Battery Regulation, with subsequent product categories --- textiles,
+construction products, electronics, chemicals, and others --- following
+progressively.
 
-This paper is motivated by a simple but consequential observation: \textbf{the architectural decisions being made now will determine whether \DPPs\ function as durable, trustworthy infrastructure for decades, or whether they degrade into a fragmented landscape of broken links, inaccessible data, and compromised intellectual property.}
+This paper is motivated by a simple but consequential observation: \textbf{the
+architectural decisions being made now will determine whether \DPPs\ function as
+durable, trustworthy infrastructure for decades, or whether they degrade into a
+fragmented landscape of broken links, inaccessible data, and compromised
+intellectual property.}
 
 \subsection{The Current Architectural Direction}
 
-The current \DPP\ architectural blueprint, as developed through \CEN\ \& \CENELEC\ \JTC~24 and articulated in the eight standards recently approved, follows a distributed model:
+The current \DPP\ architectural blueprint, as developed through \CEN\ \&
+\CENELEC\ \JTC~24 and articulated in the eight standards recently approved,
+follows a distributed model:
 
 \begin{enumerate}
     \item Each Economic Operator (EO) hosts \DPP\ data at their own endpoint.
     \item A central registry maps unique product identifiers to \EO\ endpoints.
-    \item Data is delivered as structured files (currently envisioned as \PDF-based or
+    \item Data is delivered as structured files (currently envisioned as
+    \PDF-based or
     semi-structured payloads).
     \item Access is binary --- either the endpoint is reachable, or it is not.
 \end{enumerate}
 
-As a representative of the German quality infrastructure noted at the \DPPforEU~2026 conference~\cite{dpp4eu2026_day1}, the current delivery format remains problematic: \emph{``this continuity that those data which needed in the processing are delivered as a \PDF\ they don't really help. So we want to have them databased.''} The aspiration for semantic, machine-readable standards
-persists: ``the hope is obviously that it's going to be a thing in the future and we're not going to rely on non-semantic representations like \PDF.''
+As a representative of the German quality infrastructure noted at the
+\DPPforEU~2026 conference~\cite{dpp4eu2026_day1}, the current delivery format
+remains problematic: \emph{``this continuity that those data which needed in the
+processing are delivered as a \PDF\ they don't really help. So we want to have
+them databased.''} The aspiration for semantic, machine-readable standards
+persists: ``the hope is obviously that it's going to be a thing in the future
+and we're not going to rely on non-semantic representations like \PDF.''
 
 \subsection{The Proposed Alternative}
 
-In contrast to the distributed, flat-file model, this paper proposes a \textbf{por\-tal-backed, network-structured \DPP\ architecture} built on semantic web standards. In this model, \DPPs\ are stored as linked graphs within a federation of per-member-state triple-stores, each acting as a semantic proxy archive, rather than as flat files at \EO\ endpoints. Individual \DPPs\ reference their component predecessors via semantic properties (\texttt{dpp:hasPrecursor}, \texttt{dpp:derivedFrom}), forming a network of linked passports rather than a single monolithic supply chain record. Access governance is enforced through Attribute-Based Access Control (ABAC) with branch-level \ODRL\ policies, ensuring that different user categories --- from public consumers to market surveillance authorities --- see only the data branches they are authorised to access.
+In contrast to the distributed, flat-file model, this paper proposes a
+\textbf{por\-tal-backed, network-structured \DPP\ architecture} built on
+semantic web standards. In this model, \DPPs\ are stored as linked graphs within
+a federation of per-member-state triple-stores, each acting as a semantic proxy
+archive, rather than as flat files at \EO\ endpoints. Individual \DPPs\
+reference their component predecessors via semantic properties
+(\texttt{dpp:hasPrecursor}, \texttt{dpp:derivedFrom}), forming a network of
+linked passports rather than a single monolithic supply chain record. Access
+governance is enforced through Attribute-Based Access Control (ABAC) with
+branch-level \ODRL\ policies, ensuring that different user categories --- from
+public consumers to market surveillance authorities --- see only the data
+branches they are authorised to access.
 
 \subsection{The Gap This Paper Addresses}
 
-While individual components of a robust \DPP\ architecture --- semantic representations, access control, data persistency, value-chain traceability --- are independently recognised as necessary by the practitioner community, no single proposal integrates them into a coherent architectural whole. This paper fills that gap by proposing an architecture that unifies these elements under a single governance framework.
+While individual components of a robust \DPP\ architecture --- semantic
+representations, access control, data persistency, value-chain traceability ---
+are independently recognised as necessary by the practitioner community, no
+single proposal integrates them into a coherent architectural whole. This paper
+fills that gap by proposing an architecture that unifies these elements under a
+single governance framework.
 
-The necessity of such integration is evident in the tensions visible at the \DPPforEU~2026 conference. For example, a representative from the battery passport context described an
-access control vision that is almost identical to the \ABAC\ model proposed in this paper~\cite{dpp4eu2026_day2}:
+The necessity of such integration is evident in the tensions visible at the
+\DPPforEU~2026 conference. For example, a representative from the battery
+passport context described an
+access control vision that is almost identical to the \ABAC\ model proposed in
+this paper~\cite{dpp4eu2026_day2}:
 
 \begin{quote}\emph{
-``The \DPP\ then, of course, needs to have those data in public or controlled data. The actor needs to be authenticated and authorised and needs to have those read access rights. So our expected result then is again that the actor sees those data that he's allowed to see but nothing more.''}
+``The \DPP\ then, of course, needs to have those data in public or controlled
+data. The actor needs to be authenticated and authorised and needs to have those
+read access rights. So our expected result then is again that the actor sees
+those data that he's allowed to see but nothing more.''}
 \end{quote}
 
-Yet this access control vision is not connected to a semantic graph architecture or a portal-backed storage model in any existing proposal. Similarly, the need for decades-long data persistency was directly raised at the conference~\cite{dpp4eu2026_day1}: \emph{``How do you store these data for decades and make them accessible, for example, to recyclers?''} But no presenter at the conference offered a concrete architectural solution to the link-rot and business-continuity risks that distributed \REO-hosted storage creates over such time spans.
+Yet this access control vision is not connected to a semantic graph architecture
+or a portal-backed storage model in any existing proposal. Similarly, the need
+for decades-long data persistency was directly raised at the
+conference~\cite{dpp4eu2026_day1}: \emph{``How do you store these data for
+decades and make them accessible, for example, to recyclers?''} But no presenter
+at the conference offered a concrete architectural solution to the link-rot and
+business-continuity risks that distributed \REO-hosted storage creates over such
+time spans.
 
-This paper proposes that the portal-backed graph architecture, originally presented as an honorary lecture at the \DPPforEU~2026 conference~\cite{dpp4eu2026_day2}, addresses these gaps in an integrated manner.
+This paper proposes that the portal-backed graph architecture, originally
+presented as an honorary lecture at the \DPPforEU~2026
+conference~\cite{dpp4eu2026_day2}, addresses these gaps in an integrated manner.
 
 \subsection{Contributions}
 
 This paper makes the following contributions:
 
 \begin{enumerate}
-\item A formal critique of the distributed flat-file \DPP\ model, identifying four categories of systemic risk: link rot, business continuity failure, cyberattack exposure, and \IP\ leakage.
+\item A formal critique of the distributed flat-file \DPP\ model, identifying
+four categories of systemic risk: link rot, business continuity failure,
+cyberattack exposure, and \IP\ leakage.
 
-\item The Networked Individual \DPP\ model, in which supply chains are represented as graphs of semantically linked individual \DPPs\ rather than as monolithic supply chain records embedded in a single passport.
+\item The Networked Individual \DPP\ model, in which supply chains are
+represented as graphs of semantically linked individual \DPPs\ rather than as
+monolithic supply chain records embedded in a single passport.
 
-\item A portal controller architecture with two governance loops: an Ingestion Governance Loop (\SHACL\ validation, cryptographic alignment, external entity normalisation) and a Resolution Governance Loop (graph slicing, dynamic \SPARQL\ CONSTRUCT queries based on \ABAC\ policies).
+\item A portal controller architecture with two governance loops: an Ingestion
+Governance Loop (\SHACL\ validation, cryptographic alignment, external entity
+normalisation) and a Resolution Governance Loop (graph slicing, dynamic \SPARQL\
+CONSTRUCT queries based on \ABAC\ policies).
 
 \item An ABAC framework with five standardised user categories:
 \begin{itemize}
@@ -72,13 +135,35 @@ This paper makes the following contributions:
 \end{itemize}
 and \ODRL-encoded branch-level access policies.
 
-\item A trust tier matrix for entity vetting, combining legal existence verification (\EORI\ / \VIES), competence vetting (\WthreeC\ Verifiable Credentials), and identity binding (\eIDAS~2.0).
+\item A trust tier matrix for entity vetting, combining legal existence
+verification (\EORI\ / \VIES), competence vetting (\WthreeC\ Verifiable
+Credentials), and identity binding (\eIDAS~2.0).
 
-\item A cross-registry linking strategy for chemical data governance, connecting \DPPs\ to authoritative public databases (\ECHA, \PubChem) rather than duplicating chemical hazard data.
+\item A cross-registry linking strategy for chemical data governance, connecting
+\DPPs\ to authoritative public databases (\ECHA, \PubChem) rather than
+duplicating chemical hazard data.
 
-\item \SHACL\ as a unified data modelling language, serving both conformity checking and \GUI\ generation, supported by a modular \SHACL\ brick library, a two-stage design toolchain, and a public repository for ontologised regulations and standards.
+\item \SHACL\ as a unified data modelling language, serving both conformity
+checking and \GUI\ generation, supported by a modular \SHACL\ brick library, a
+two-stage design toolchain, and a public repository for ontologised regulations
+and standards.
 \end{enumerate}
 
 \subsection{Paper Structure}
 
-Section~2 presents the problem statement and critique of the current distributed flat-file model. Section~3 introduces the Networked Individual \DPP\ model, in which each \DPP\ is a node in a knowledge graph within a production network. Section~4 details the portal architecture, controller governance, the Ingestion and Resolution Governance Loops, and the portal \API. Section~5 presents the \ABAC\ framework with five standardised user categories, \ODRL\ branch-level access policies, the trust tier matrix, and the \EC\ Authorisation App. Section~6 presents \SHACL\ as a unified data modelling language, including the \SHACL\ brick library, the two-stage design toolchain, and the public repository for ontologised regulations and standards. Section~7 addresses chemical data governance and cross-registry linking to authoritative external databases. Section~8 discusses implementation considerations, including the role of DigiPass Europe as community sustainer, the \SME\ challenge, cross-border interoperability, and open challenges. Section~9 concludes with a roadmap for the European Commission. Appendix~A specifies the portal \REST\ \API, and Appendix~B provides example \API\ interaction sequences.
+Section~2 presents the problem statement and critique of the current distributed
+flat-file model. Section~3 introduces the Networked Individual \DPP\ model, in
+which each \DPP\ is a node in a knowledge graph within a production network.
+Section~4 details the portal architecture, controller governance, the Ingestion
+and Resolution Governance Loops, and the portal \API. Section~5 presents the
+\ABAC\ framework with five standardised user categories, \ODRL\ branch-level
+access policies, the trust tier matrix, and the \EC\ Authorisation App.
+Section~6 presents \SHACL\ as a unified data modelling language, including the
+\SHACL\ brick library, the two-stage design toolchain, and the public repository
+for ontologised regulations and standards. Section~7 addresses chemical data
+governance and cross-registry linking to authoritative external databases.
+Section~8 discusses implementation considerations, including the role of
+DigiPass Europe as community sustainer, the \SME\ challenge, cross-border
+interoperability, and open challenges. Section~9 concludes with a roadmap for
+the European Commission. Appendix~A specifies the portal \REST\ \API, and
+Appendix~B provides example \API\ interaction sequences.

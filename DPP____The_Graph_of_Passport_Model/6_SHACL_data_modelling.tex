@@ -1,136 +1,374 @@
-% ===================================================================% ===================================================================
+% ===================================================================%
+% ===================================================================
 \section{\SHACL\ as a Unified Data Modelling Language}
 % ===================================================================
 
 \subsection{The Dual Role of \SHACL}
 
-A central innovation of the proposed architecture is the use of \SHACL\ (Shapes Constraint Language)~\cite{shacl_spec} not merely as a validation tool but as a \textbf{unified data modelling language} that serves two complementary purposes: (1)~as the basis for conformity checking of submitted \DPP\ data against applicable regulations and standards, and (2)~as the generative source for user interfaces --- \DPP\ websites and application program interfaces --- via \SHACL-to-HTML rendering engines. This dual role transforms \SHACL\ from a passive validation layer into an active modelling substrate that drives both data ingestion and data presentation.
+A central innovation of the proposed architecture is the use of \SHACL\ (Shapes
+Constraint Language)~\cite{shacl_spec} not merely as a validation tool but as a
+\textbf{unified data modelling language} that serves two complementary purposes:
+(1)~as the basis for conformity checking of submitted \DPP\ data against
+applicable regulations and standards, and (2)~as the generative source for user
+interfaces --- \DPP\ websites and application program interfaces --- via
+\SHACL-to-HTML rendering engines. This dual role transforms \SHACL\ from a
+passive validation layer into an active modelling substrate that drives both
+data ingestion and data presentation.
 
-At \DPPforEU~2026, \SHACL\ was described by a conference participant as ``\textit{a very elegant approach}'' for \DPP\ validation, and a NILU researcher was introduced as speaking about ``\textit{\SHACL\ information models and how they will be solving all our problems}''~\cite{dpp4eu2026_day1}. The conference discussion revealed that the community recognises \SHACL's potential but has not yet connected it to a portal-backed architecture where \SHACL\ shapes serve as the single source of truth for both validation and interface generation. The proposed architecture makes this connection explicit: \SHACL\ shapes are stored in the public repository on the \EC\ \DPP\ registry, used by the portal controller for ingestion validation (Section~4.2.1), and used by application developers to generate user interfaces that, by construction, ensure user-entered data conforms to regulations and standards.
+At \DPPforEU~2026, \SHACL\ was described by a conference participant as
+``\textit{a very elegant approach}'' for \DPP\ validation, and a NILU researcher
+was introduced as speaking about ``\textit{\SHACL\ information models and how
+they will be solving all our problems}''~\cite{dpp4eu2026_day1}. The conference
+discussion revealed that the community recognises \SHACL's potential but has not
+yet connected it to a portal-backed architecture where \SHACL\ shapes serve as
+the single source of truth for both validation and interface generation. The
+proposed architecture makes this connection explicit: \SHACL\ shapes are stored
+in the public repository on the \EC\ \DPP\ registry, used by the portal
+controller for ingestion validation (Section~4.2.1), and used by application
+developers to generate user interfaces that, by construction, ensure
+user-entered data conforms to regulations and standards.
 
 \subsection{\SHACL\ for Conformity Checking}
 
-The first role of \SHACL\ is conformity checking: verifying that submitted \DPP\ data satisfies the structural, cardinality, datatype, and semantic constraints defined by applicable regulations and harmonised standards. As a \JTC~24 representative observed at \DPPforEU~2026, machine-readable product data must become checkable by machine-readable regulation~\cite{dpp4eu2026_day1}. The portal-backed architecture makes this a present capability by maintaining \SHACL\ shapes --- one set for each product category and applicable regulation --- in the same semantic framework as the \DPP\ data itself.
+The first role of \SHACL\ is conformity checking: verifying that submitted \DPP\
+data satisfies the structural, cardinality, datatype, and semantic constraints
+defined by applicable regulations and harmonised standards. As a \JTC~24
+representative observed at \DPPforEU~2026, machine-readable product data must
+become checkable by machine-readable regulation~\cite{dpp4eu2026_day1}. The
+portal-backed architecture makes this a present capability by maintaining
+\SHACL\ shapes --- one set for each product category and applicable regulation
+--- in the same semantic framework as the \DPP\ data itself.
 
-When an \REO\ submits \DPP\ data to the portal, the Ingestion Governance Loop validates the data against the \SHACL\ shapes corresponding to the product's category and regulatory context (Section~4.2.1). If validation fails, the \DPP\ is rejected with a structured error report indicating which shapes were violated and which data points failed. This design ensures that only regulation-compliant data enters the triple-store. The conformity checking is not a post-hoc audit but a precondition for ingestion: data that does not conform to the applicable \SHACL\ shapes is never committed to the portal.
+When an \REO\ submits \DPP\ data to the portal, the Ingestion Governance Loop
+validates the data against the \SHACL\ shapes corresponding to the product's
+category and regulatory context (Section~4.2.1). If validation fails, the \DPP\
+is rejected with a structured error report indicating which shapes were violated
+and which data points failed. This design ensures that only regulation-compliant
+data enters the triple-store. The conformity checking is not a post-hoc audit
+but a precondition for ingestion: data that does not conform to the applicable
+\SHACL\ shapes is never committed to the portal.
 
-The conference observation that ``\textit{you still have to look in the book whether what you see on the screen is actually according to requirements}''~\cite{dpp4eu2026_day1} is resolved structurally: the ``book'' (the regulation) is represented as \SHACL\ shapes, and the checking is performed automatically at ingestion time. The quality infrastructure community's emphasis on linking \DPPs\ to standards, measurements, and certificates (see Section~7.4) is realised through \SHACL\ shapes that reference the applicable standards and certificate schemas, ensuring that the \DPP\ data is not only structurally valid but also semantically aligned with the regulatory requirements it claims to satisfy.
+The conference observation that ``\textit{you still have to look in the book
+whether what you see on the screen is actually according to
+requirements}''~\cite{dpp4eu2026_day1} is resolved structurally: the ``book''
+(the regulation) is represented as \SHACL\ shapes, and the checking is performed
+automatically at ingestion time. The quality infrastructure community's emphasis
+on linking \DPPs\ to standards, measurements, and certificates (see Section~7.4)
+is realised through \SHACL\ shapes that reference the applicable standards and
+certificate schemas, ensuring that the \DPP\ data is not only structurally valid
+but also semantically aligned with the regulatory requirements it claims to
+satisfy.
 
 \subsection{\SHACL\ for \GUI\ Generation via \DASH}
 
-The second role of \SHACL\ is interface generation: using \SHACL\ shapes as the basis for generating user interfaces --- web forms, mobile app screens, and \API\ schemas --- that enable economic operators to enter \DPP\ data. This is implemented through \SHACL-to-HTML rendering engines such as \DASH\ (\SHACL\ Application Dashboard)~\cite{dash_shacl} and the open-source shacl-form library~\cite{shacl_form_lib} developed by the Universitäts- und Landesbibliothek Darmstadt. At \DPPforEU~2026, a participant from the DigiPass project described how \SHACL\ can ``\textit{validate a knowledge graph that is coming as ingested information and it can also be used as has been done in our project to automatically generate a form for manual data ingest}''~\cite{dpp4eu2026_day2}.
+The second role of \SHACL\ is interface generation: using \SHACL\ shapes as the
+basis for generating user interfaces --- web forms, mobile app screens, and
+\API\ schemas --- that enable economic operators to enter \DPP\ data. This is
+implemented through \SHACL-to-HTML rendering engines such as \DASH\ (\SHACL\
+Application Dashboard)~\cite{dash_shacl} and the open-source shacl-form
+library~\cite{shacl_form_lib} developed by the Universitäts- und
+Landesbibliothek Darmstadt. At \DPPforEU~2026, a participant from the DigiPass
+project described how \SHACL\ can ``\textit{validate a knowledge graph that is
+coming as ingested information and it can also be used as has been done in our
+project to automatically generate a form for manual data
+ingest}''~\cite{dpp4eu2026_day2}.
 
-This dual-use capability is the key insight: the same \SHACL\ shapes that validate submitted data at the portal can also generate the data entry forms that produce the data in the first place. When an application developer builds a \DPP\ data entry tool --- a web platform or a mobile app --- they use the \SHACL\ shapes from the public repository to generate the user interface. The generated interface presents fields corresponding to the \SHACL\ properties, enforces cardinality and datatype constraints, and validates user input against the shapes in real time. By construction, the data entered through such an interface conforms to the regulations and standards encoded in the \SHACL\ shapes. This eliminates the gap between data entry and data validation: the same shapes govern both, ensuring that data is ``born compliant'' rather than being checked for compliance after the fact.
+This dual-use capability is the key insight: the same \SHACL\ shapes that
+validate submitted data at the portal can also generate the data entry forms
+that produce the data in the first place. When an application developer builds a
+\DPP\ data entry tool --- a web platform or a mobile app --- they use the
+\SHACL\ shapes from the public repository to generate the user interface. The
+generated interface presents fields corresponding to the \SHACL\ properties,
+enforces cardinality and datatype constraints, and validates user input against
+the shapes in real time. By construction, the data entered through such an
+interface conforms to the regulations and standards encoded in the \SHACL\
+shapes. This eliminates the gap between data entry and data validation: the same
+shapes govern both, ensuring that data is ``born compliant'' rather than being
+checked for compliance after the fact.
 
 \subsection{The \SHACL\ Brick Library}
 
-To enable modular, maintainable, and regulation-aware interface generation, we propose a \textbf{\SHACL\ brick library}: a collection of modular, regulation-compliant \SHACL\ shape components --- ``bricks'' --- that are reviewed against applicable regulations, delegated acts, and harmonised standards, and then assembled into complete \SHACL\ schemas for specific product categories and regulatory contexts.
+To enable modular, maintainable, and regulation-aware interface generation, we
+propose a \textbf{\SHACL\ brick library}: a collection of modular,
+regulation-compliant \SHACL\ shape components --- ``bricks'' --- that are
+reviewed against applicable regulations, delegated acts, and harmonised
+standards, and then assembled into complete \SHACL\ schemas for specific product
+categories and regulatory contexts.
 
-A \SHACL\ brick represents a coherent unit of regulatory or standard-based requirements: for example, a ``chemical composition brick'' that encodes the data points and constraints required by \REACH\ for substance declaration, a ``carbon footprint brick'' that encodes the data points required by the ESPR for environmental impact declaration, or a ``battery composition brick'' that encodes the data points required by the Battery Regulation. Each brick is independently developed, independently validated against the source regulation, and independently versioned. When a new regulation is adopted, or an existing regulation is amended, only the affected bricks are updated; all schemas that do not use those bricks remain unchanged.
+A \SHACL\ brick represents a coherent unit of regulatory or standard-based
+requirements: for example, a ``chemical composition brick'' that encodes the
+data points and constraints required by \REACH\ for substance declaration, a
+``carbon footprint brick'' that encodes the data points required by the ESPR for
+environmental impact declaration, or a ``battery composition brick'' that
+encodes the data points required by the Battery Regulation. Each brick is
+independently developed, independently validated against the source regulation,
+and independently versioned. When a new regulation is adopted, or an existing
+regulation is amended, only the affected bricks are updated; all schemas that do
+not use those bricks remain unchanged.
 
-The brick library is hosted on the public repository for ontologised regulations and standards (Section~6.7), making it accessible to all \DPP\ stakeholders: portal operators, application developers, economic operators, and market surveillance authorities. The conference principle that ``\textit{everything needs to be ontologised}'' (Section~3.5) is realised through the brick library: regulations, standards, data models, and validation shapes are all represented as modular semantic artefacts within a unified framework.
+The brick library is hosted on the public repository for ontologised regulations
+and standards (Section~6.7), making it accessible to all \DPP\ stakeholders:
+portal operators, application developers, economic operators, and market
+surveillance authorities. The conference principle that ``\textit{everything
+needs to be ontologised}'' (Section~3.5) is realised through the brick library:
+regulations, standards, data models, and validation shapes are all represented
+as modular semantic artefacts within a unified framework.
 
 \subsection{The Two-Stage \SHACL\ Design Toolchain}
 
-The generation of complete \SHACL\ schemas from the brick library requires a \textbf{two-stage \SHACL\ design toolchain}: a brick generator and a schema assembler.
+The generation of complete \SHACL\ schemas from the brick library requires a
+\textbf{two-stage \SHACL\ design toolchain}: a brick generator and a schema
+assembler.
 
 \subsubsection{Stage 1: The Brick Generator}
 
-The brick generator is a tool that takes ontologised regulatory and standard-based information as input and produces individual \SHACL\ bricks as output. The input is domain-specific semantic information: ontologies, vocabularies, and structured representations of regulatory requirements for a specific product domain (e.g., batteries, textiles, construction products, chemicals). The output is a set of \SHACL\ shape components, each encoding a coherent unit of regulatory requirements. The brick generator requires that semantic information for product-domain-specific regulations and standards be generated and made available (Section~6.8). This is a non-trivial task: it requires domain experts (regulatory specialists, standards experts, product category specialists) to collaborate with ontology engineers to produce machine-readable representations of regulatory requirements. The conference discussion on building ``\textit{ontologies with experts}''~\cite{dpp4eu2026_day2} directly motivates this stage: the brick generator is the tool that bridges the gap between domain expert knowledge and machine-readable \SHACL\ shapes.
+The brick generator is a tool that takes ontologised regulatory and
+standard-based information as input and produces individual \SHACL\ bricks as
+output. The input is domain-specific semantic information: ontologies,
+vocabularies, and structured representations of regulatory requirements for a
+specific product domain (e.g., batteries, textiles, construction products,
+chemicals). The output is a set of \SHACL\ shape components, each encoding a
+coherent unit of regulatory requirements. The brick generator requires that
+semantic information for product-domain-specific regulations and standards be
+generated and made available (Section~6.8). This is a non-trivial task: it
+requires domain experts (regulatory specialists, standards experts, product
+category specialists) to collaborate with ontology engineers to produce
+machine-readable representations of regulatory requirements. The conference
+discussion on building ``\textit{ontologies with
+experts}''~\cite{dpp4eu2026_day2} directly motivates this stage: the brick
+generator is the tool that bridges the gap between domain expert knowledge and
+machine-readable \SHACL\ shapes.
 
 \subsubsection{Stage 2: The Schema Assembler}
 
-The schema assembler is a tool that takes a set of \SHACL\ bricks and assembles them into a complete \SHACL\ schema for a specific product category and regulatory context. The assembler selects the relevant bricks based on the product category, the applicable regulations, and the applicable harmonised standards, and combines them into a unified \SHACL\ shape graph. The assembled schema is then used for two purposes: (1)~by the portal controller for ingestion validation, and (2)~by application developers for interface generation via \DASH\ or shacl-form. The assembler ensures that the assembled schema is consistent --- no conflicting constraints, no duplicate properties, no missing mandatory shapes --- and that it covers all regulatory requirements applicable to the target product category. When a regulation is updated, the assembler re-generates the schema from the updated bricks, ensuring that all downstream applications --- portal validation, data entry forms, \API\ schemas --- reflect the most current regulatory requirements.
+The schema assembler is a tool that takes a set of \SHACL\ bricks and assembles
+them into a complete \SHACL\ schema for a specific product category and
+regulatory context. The assembler selects the relevant bricks based on the
+product category, the applicable regulations, and the applicable harmonised
+standards, and combines them into a unified \SHACL\ shape graph. The assembled
+schema is then used for two purposes: (1)~by the portal controller for ingestion
+validation, and (2)~by application developers for interface generation via
+\DASH\ or shacl-form. The assembler ensures that the assembled schema is
+consistent --- no conflicting constraints, no duplicate properties, no missing
+mandatory shapes --- and that it covers all regulatory requirements applicable
+to the target product category. When a regulation is updated, the assembler
+re-generates the schema from the updated bricks, ensuring that all downstream
+applications --- portal validation, data entry forms, \API\ schemas --- reflect
+the most current regulatory requirements.
 
 \subsection{Licensed \DPP\ Application Ecosystem}
 \label{sec:licensed-apps}
 
-The \SHACL-driven architecture creates a new category of economic actor: \textbf{licensed \DPP\ application providers} --- software businesses that specialise in building, maintaining, and distributing regulation-compliant \DPP\ generation and maintenance applications for specific product domains. For large companies, the \DPP\ task may be handled as part of their internal digitalisation programme; for smaller businesses, however, generating a \DPP\ can be very costly in terms of the time required to learn about the regulations and delegated acts, and the process of registering and maintenance~\cite{dpp4eu2026_postconf}. Licensed \DPP\ application providers fill this gap by offering expertly designed software tools that run on small computer systems, including PCs and mobile phones, handling the full \DPP\ lifecycle --- creation, registration, update, and maintenance --- without requiring the economic operator to develop deep regulatory or semantic expertise. As the DigiPass consortium envisioned, the approved \SHACL\ snippet library serves as a very valuable source for generating such applications~\cite{dpp4eu2026_postconf}.
+The \SHACL-driven architecture creates a new category of economic actor:
+\textbf{licensed \DPP\ application providers} --- software businesses that
+specialise in building, maintaining, and distributing regulation-compliant \DPP\
+generation and maintenance applications for specific product domains. For large
+companies, the \DPP\ task may be handled as part of their internal
+digitalisation programme; for smaller businesses, however, generating a \DPP\
+can be very costly in terms of the time required to learn about the regulations
+and delegated acts, and the process of registering and
+maintenance~\cite{dpp4eu2026_postconf}. Licensed \DPP\ application providers
+fill this gap by offering expertly designed software tools that run on small
+computer systems, including PCs and mobile phones, handling the full \DPP\
+lifecycle --- creation, registration, update, and maintenance --- without
+requiring the economic operator to develop deep regulatory or semantic
+expertise. As the DigiPass consortium envisioned, the approved \SHACL\ snippet
+library serves as a very valuable source for generating such
+applications~\cite{dpp4eu2026_postconf}.
 
 \subsubsection{The Three-Stage Licensing Pipeline}
 
-The generation of licensed \DPP\ applications extends the two-stage \SHACL\ design toolchain (Section~6.5) with a third stage: \textbf{app generation, review, and licensing}. The full pipeline is:
+The generation of licensed \DPP\ applications extends the two-stage \SHACL\
+design toolchain (Section~6.5) with a third stage: \textbf{app generation,
+review, and licensing}. The full pipeline is:
 
 \begin{enumerate}
-\item \textbf{Brick generation} (Stage~1): domain experts and ontology engineers produce \SHACL\ bricks from ontologised regulations and domain-specific semantic information.
-\item \textbf{Schema assembly} (Stage~2): the schema assembler combines bricks into complete \SHACL\ schemas for specific product categories and regulatory contexts.
-\item \textbf{App generation and licensing} (Stage~3): licensed \DPP\ application providers construct tailored applications from the assembled \SHACL\ schemas, using \SHACL-to-HTML rendering engines such as \DASH\ or shacl-form. The resulting application is reviewed, approved, and licensed for distribution.
+\item \textbf{Brick generation} (Stage~1): domain experts and ontology engineers
+produce \SHACL\ bricks from ontologised regulations and domain-specific semantic
+information.
+\item \textbf{Schema assembly} (Stage~2): the schema assembler combines bricks
+into complete \SHACL\ schemas for specific product categories and regulatory
+contexts.
+\item \textbf{App generation and licensing} (Stage~3): licensed \DPP\
+application providers construct tailored applications from the assembled \SHACL\
+schemas, using \SHACL-to-HTML rendering engines such as \DASH\ or shacl-form.
+The resulting application is reviewed, approved, and licensed for distribution.
 \end{enumerate}
 
 \subsubsection{Dual Authorisation}
 
-The licensing of \DPP\ application providers follows a dual authorisation model, reflecting the dual nature of the regulatory and professional requirements. First, the \EC, through the portal authority, authorises the software business to operate as a licensed \DPP\ application provider, verifying its legal existence and operational competence. Second, professional organisations (e.g., industry associations, standardisation bodies) authorise the provider's domain-specific competence, ensuring that the applications it produces are technically and regulatorily appropriate for the product categories they cover. This dual authorisation model mirrors the trust tier matrix (Section~5.5): legal existence is verified through the first pillar, and domain competence is verified through the second pillar, but applied to software providers rather than data requesters.
+The licensing of \DPP\ application providers follows a dual authorisation model,
+reflecting the dual nature of the regulatory and professional requirements.
+First, the \EC, through the portal authority, authorises the software business
+to operate as a licensed \DPP\ application provider, verifying its legal
+existence and operational competence. Second, professional organisations (e.g.,
+industry associations, standardisation bodies) authorise the provider's
+domain-specific competence, ensuring that the applications it produces are
+technically and regulatorily appropriate for the product categories they cover.
+This dual authorisation model mirrors the trust tier matrix (Section~5.5): legal
+existence is verified through the first pillar, and domain competence is
+verified through the second pillar, but applied to software providers rather
+than data requesters.
 
 \subsubsection{The Review Board}
 
-A \textbf{review board} --- a technical body established at the authority/portal level --- validates submitted \SHACL\ bricks, assembled schemas, and generated applications against the applicable regulations, delegated acts, and norms~\cite{dpp4eu2026_postconf}. The review board has three responsibilities:
+A \textbf{review board} --- a technical body established at the authority/portal
+level --- validates submitted \SHACL\ bricks, assembled schemas, and generated
+applications against the applicable regulations, delegated acts, and
+norms~\cite{dpp4eu2026_postconf}. The review board has three responsibilities:
 
 \begin{enumerate}
-\item \textbf{Brick review}: each \SHACL\ brick submitted to the public library is reviewed for regulatory accuracy, semantic correctness, and consistency with the source regulation.
-\item \textbf{Schema review}: assembled \SHACL\ schemas are reviewed for completeness (all applicable regulatory requirements covered), consistency (no conflicting constraints), and correctness (no missing mandatory shapes).
-\item \textbf{Application review}: generated \DPP\ applications are reviewed for regulatory compliance, correct use of the portal \API, and foolproofness (see Section~6.6.4).
+\item \textbf{Brick review}: each \SHACL\ brick submitted to the public library
+is reviewed for regulatory accuracy, semantic correctness, and consistency with
+the source regulation.
+\item \textbf{Schema review}: assembled \SHACL\ schemas are reviewed for
+completeness (all applicable regulatory requirements covered), consistency (no
+conflicting constraints), and correctness (no missing mandatory shapes).
+\item \textbf{Application review}: generated \DPP\ applications are reviewed for
+regulatory compliance, correct use of the portal \API, and foolproofness (see
+Section~6.6.4).
 \end{enumerate}
 
-The review board is funded through a dedicated \EU\ budget line that finances the maintenance of the open-access standards repository, the \SHACL\ brick review process, and the federation-service \APIs~\cite{dpp4eu2026_postconf}.
+The review board is funded through a dedicated \EU\ budget line that finances
+the maintenance of the open-access standards repository, the \SHACL\ brick
+review process, and the federation-service \APIs~\cite{dpp4eu2026_postconf}.
 
 \subsubsection{Foolproof by Construction}
 
-The defining property of a licensed \DPP\ application is that it is \textbf{foolproof by construction}: the application generates \RDF\ graphs that, when submitted to the portal, will not fail \SHACL\ validation. This guarantee is structural, not accidental. Because the application's data entry forms are generated from the same \SHACL\ shapes that the portal controller uses for ingestion validation (Section~4.2.1), the forms enforce exactly the constraints that the portal will check. Cardinality, datatype, and semantic constraints are validated in real time during data entry; the user cannot submit a \DPP\ that violates a shape constraint because the form itself prevents it. As a conference participant from the DigiPass project described, \SHACL\ can ``\textit{validate a knowledge graph that is coming as ingested information and it can also be used as has been done in our project to automatically generate a form for manual data ingest}''~\cite{dpp4eu2026_day2}. The licensed \DPP\ application ecosystem operationalises this dual-use capability as a guarantee: the same shapes that validate at the portal generate the forms at the point of data entry, ensuring that data is ``born compliant'' (Section~6.3).
+The defining property of a licensed \DPP\ application is that it is
+\textbf{foolproof by construction}: the application generates \RDF\ graphs that,
+when submitted to the portal, will not fail \SHACL\ validation. This guarantee
+is structural, not accidental. Because the application's data entry forms are
+generated from the same \SHACL\ shapes that the portal controller uses for
+ingestion validation (Section~4.2.1), the forms enforce exactly the constraints
+that the portal will check. Cardinality, datatype, and semantic constraints are
+validated in real time during data entry; the user cannot submit a \DPP\ that
+violates a shape constraint because the form itself prevents it. As a conference
+participant from the DigiPass project described, \SHACL\ can ``\textit{validate
+a knowledge graph that is coming as ingested information and it can also be used
+as has been done in our project to automatically generate a form for manual data
+ingest}''~\cite{dpp4eu2026_day2}. The licensed \DPP\ application ecosystem
+operationalises this dual-use capability as a guarantee: the same shapes that
+validate at the portal generate the forms at the point of data entry, ensuring
+that data is ``born compliant'' (Section~6.3).
 
 \subsubsection{Portal \API\ Integration}
 
-Licensed \DPP\ applications must integrate with the portal \API\ (Section~4.6) for all \DPP\ lifecycle operations: authentication, \DPP\ creation, update, revocation, registration with the \EC\ central registry, link traversal, and \SPARQL\ query. This requirement ensures that:
+Licensed \DPP\ applications must integrate with the portal \API\ (Section~4.6)
+for all \DPP\ lifecycle operations: authentication, \DPP\ creation, update,
+revocation, registration with the \EC\ central registry, link traversal, and
+\SPARQL\ query. This requirement ensures that:
 
 \begin{itemize}
-\item All \DPP\ data generated by licensed applications passes through the Ingestion Governance Loop, receiving \SHACL\ validation, cryptographic alignment, and external entity normalisation.
-\item All \DPP\ updates propagate correctly through the linked \DPP\ network via \texttt{dpp:hasPrecursor} and \texttt{dpp:derivedFrom}.
-\item All access requests pass through the Resolution Governance Loop, with \ABAC\ policies enforced uniformly regardless of the originating application.
+\item All \DPP\ data generated by licensed applications passes through the
+Ingestion Governance Loop, receiving \SHACL\ validation, cryptographic
+alignment, and external entity normalisation.
+\item All \DPP\ updates propagate correctly through the linked \DPP\ network via
+\texttt{dpp:hasPrecursor} and \texttt{dpp:derivedFrom}.
+\item All access requests pass through the Resolution Governance Loop, with
+\ABAC\ policies enforced uniformly regardless of the originating application.
 \end{itemize}
 
-The portal \API\ thus serves as the single integration point between licensed applications and the portal infrastructure, ensuring architectural consistency across the entire application ecosystem.
+The portal \API\ thus serves as the single integration point between licensed
+applications and the portal infrastructure, ensuring architectural consistency
+across the entire application ecosystem.
 
 \subsection{The Public Repository for Ontologised Regulations and Standards}
 
-The brick library and the assembled \SHACL\ schemas are hosted in a \textbf{public repository for ontologised regulations and standards}, maintained on the \EC\ \DPP\ registry alongside the central identifier resolution service. This repository contains:
+The brick library and the assembled \SHACL\ schemas are hosted in a
+\textbf{public repository for ontologised regulations and standards}, maintained
+on the \EC\ \DPP\ registry alongside the central identifier resolution service.
+This repository contains:
 
 \begin{itemize}
-\item \textbf{Ontologised regulations}: machine-readable representations of the ESPR, the Battery Regulation, \REACH, and product-specific delegated acts, expressed as \RDF\ graphs with links to the original legal text.
-\item \textbf{Ontologised standards}: machine-readable representations of harmonised standards (EN~18215--18232 \cite{en18215}) and sector-specific standards, expressed as \RDF\ graphs.
-\item \textbf{\SHACL\ bricks}: modular shape components encoding regulatory and standard-based requirements, produced by the brick generator.
-\item \textbf{Assembled \SHACL\ schemas}: complete shape graphs for specific product categories and regulatory contexts, produced by the schema assembler.
-\item \textbf{Domain ontologies}: product-domain-specific ontologies (e.g., battery ontology, textile ontology, construction ontology) that provide the semantic vocabulary for the \SHACL\ shapes.
+\item \textbf{Ontologised regulations}: machine-readable representations of the
+ESPR, the Battery Regulation, \REACH, and product-specific delegated acts,
+expressed as \RDF\ graphs with links to the original legal text.
+\item \textbf{Ontologised standards}: machine-readable representations of
+harmonised standards (EN~18215--18232 \cite{en18215}) and sector-specific
+standards, expressed as \RDF\ graphs.
+\item \textbf{\SHACL\ bricks}: modular shape components encoding regulatory and
+standard-based requirements, produced by the brick generator.
+\item \textbf{Assembled \SHACL\ schemas}: complete shape graphs for specific
+product categories and regulatory contexts, produced by the schema assembler.
+\item \textbf{Domain ontologies}: product-domain-specific ontologies (e.g.,
+battery ontology, textile ontology, construction ontology) that provide the
+semantic vocabulary for the \SHACL\ shapes.
 \end{itemize}
 
-The repository is public, freely accessible, and continuously updated as regulations evolve and new product categories come under \DPP\ requirements. The conference aspiration that standards should be ``\textit{publicly accessible, and they should be for free, they should not be sold by \DIN\ and other organisations}''~\cite{dpp4eu2026_day2} is operationalised through this repository: ontologised regulations and standards are hosted on a public \EC\ infrastructure, accessible to all \DPP\ stakeholders without payment. Both the regulations (as ontologised legal text) and the validation shapes (as \SHACL\ bricks and schemas) are available in machine-readable form, enabling automated compliance checking at scale.
+The repository is public, freely accessible, and continuously updated as
+regulations evolve and new product categories come under \DPP\ requirements. The
+conference aspiration that standards should be ``\textit{publicly accessible,
+and they should be for free, they should not be sold by \DIN\ and other
+organisations}''~\cite{dpp4eu2026_day2} is operationalised through this
+repository: ontologised regulations and standards are hosted on a public \EC\
+infrastructure, accessible to all \DPP\ stakeholders without payment. Both the
+regulations (as ontologised legal text) and the validation shapes (as \SHACL\
+bricks and schemas) are available in machine-readable form, enabling automated
+compliance checking at scale.
 
 \subsection{Domain-Specific Semantic Information for Brick Generation}
 
-The brick generator (Stage~1 of the toolchain) requires that semantic information for product-domain-specific regulations and standards be generated and made available. This is the foundational layer of the \SHACL\ architecture: without domain-specific ontologies and structured regulatory representations, the brick generator has no input, and no \SHACL\ bricks can be produced. As the Materials Commons presentation at \DPPforEU~2026 described, this involves ``\textit{the implementation of the semantic framework network and the infrastructure setup}''~\cite{dpp4eu2026_day2}.
+The brick generator (Stage~1 of the toolchain) requires that semantic
+information for product-domain-specific regulations and standards be generated
+and made available. This is the foundational layer of the \SHACL\ architecture:
+without domain-specific ontologies and structured regulatory representations,
+the brick generator has no input, and no \SHACL\ bricks can be produced. As the
+Materials Commons presentation at \DPPforEU~2026 described, this involves
+``\textit{the implementation of the semantic framework network and the
+infrastructure setup}''~\cite{dpp4eu2026_day2}.
 
 The domain-specific semantic information must cover:
 
 \begin{itemize}
-\item \textbf{Regulatory requirements}: the specific data points, thresholds, and constraints mandated by the ESPR, delegated acts, and product-specific regulations for each product category.
-\item \textbf{Standard-based requirements}: the specific data points, measurement methods, and conformity assessment procedures defined by harmonised standards (EN~18215--18232) \cite{en18215, en18216, en18217, en18221, en18222} and sector-specific standards.
-\item \textbf{Data models}: the structured representations of product, component, and material data for each product category, including properties, relationships, and cardinalities.
-\item \textbf{Vocabularies}: the controlled vocabularies, code lists, and classification schemes used in each product domain (e.g., material classification codes, hazard categories, recycling codes).
+\item \textbf{Regulatory requirements}: the specific data points, thresholds,
+and constraints mandated by the ESPR, delegated acts, and product-specific
+regulations for each product category.
+\item \textbf{Standard-based requirements}: the specific data points,
+measurement methods, and conformity assessment procedures defined by harmonised
+standards (EN~18215--18232) \cite{en18215, en18216, en18217, en18221, en18222}
+and sector-specific standards.
+\item \textbf{Data models}: the structured representations of product,
+component, and material data for each product category, including properties,
+relationships, and cardinalities.
+\item \textbf{Vocabularies}: the controlled vocabularies, code lists, and
+classification schemes used in each product domain (e.g., material
+classification codes, hazard categories, recycling codes).
 \end{itemize}
 
-This domain-specific semantic information is the input to the brick generator, which produces \SHACL\ bricks that encode these requirements in a machine-actionable form. The bricks are then assembled into complete schemas by the schema assembler and published in the public repository, where they are available for portal validation and interface generation.
+This domain-specific semantic information is the input to the brick generator,
+which produces \SHACL\ bricks that encode these requirements in a
+machine-actionable form. The bricks are then assembled into complete schemas by
+the schema assembler and published in the public repository, where they are
+available for portal validation and interface generation.
 
 \subsection{The SHACL-Driven Data Lifecycle}
 
-The \SHACL-centric architecture creates a coherent data lifecycle that spans from regulation to data entry to validation to storage to access:
+The \SHACL-centric architecture creates a coherent data lifecycle that spans
+from regulation to data entry to validation to storage to access:
 
 \begin{enumerate}
-\item \textbf{Regulation ontologisation}: regulations and standards are represented as machine-readable semantic artefacts in the public repository.
-\item \textbf{Brick generation}: the brick generator produces \SHACL\ bricks from the ontologised regulations and domain-specific semantic information.
-\item \textbf{Schema assembly}: the schema assembler combines bricks into complete \SHACL\ schemas for specific product categories.
-\item \textbf{Application generation and licensing}: licensed \DPP\ application providers construct tailored applications from the assembled schemas, reviewed and approved by the review board (Section~6.6).
-\item \textbf{Data entry}: economic operators enter \DPP\ data through the licensed applications, which validate input against the \SHACL\ shapes in real time.
-\item \textbf{Ingestion validation}: the portal controller validates submitted \DPP\ data against the same \SHACL\ shapes during the Ingestion Governance Loop.
-\item \textbf{Storage}: validated \DPP\ data is committed to the portal's triple-store as \RDF\ named graphs.
-\item \textbf{Access}: the Resolution Governance Loop filters and serves \DPP\ data based on \ABAC\ policies (Section~5).
+\item \textbf{Regulation ontologisation}: regulations and standards are
+represented as machine-readable semantic artefacts in the public repository.
+\item \textbf{Brick generation}: the brick generator produces \SHACL\ bricks
+from the ontologised regulations and domain-specific semantic information.
+\item \textbf{Schema assembly}: the schema assembler combines bricks into
+complete \SHACL\ schemas for specific product categories.
+\item \textbf{Application generation and licensing}: licensed \DPP\ application
+providers construct tailored applications from the assembled schemas, reviewed
+and approved by the review board (Section~6.6).
+\item \textbf{Data entry}: economic operators enter \DPP\ data through the
+licensed applications, which validate input against the \SHACL\ shapes in real
+time.
+\item \textbf{Ingestion validation}: the portal controller validates submitted
+\DPP\ data against the same \SHACL\ shapes during the Ingestion Governance Loop.
+\item \textbf{Storage}: validated \DPP\ data is committed to the portal's
+triple-store as \RDF\ named graphs.
+\item \textbf{Access}: the Resolution Governance Loop filters and serves \DPP\
+data based on \ABAC\ policies (Section~5).
 \end{enumerate}
 
-At every stage, the \SHACL\ shapes serve as the single source of truth for what constitutes valid, regulation-compliant \DPP\ data, making the conference aspirations for machine-checkable regulation and universal ontologisation operational within a single, coherent architectural framework.
+At every stage, the \SHACL\ shapes serve as the single source of truth for what
+constitutes valid, regulation-compliant \DPP\ data, making the conference
+aspirations for machine-checkable regulation and universal ontologisation
+operational within a single, coherent architectural framework.

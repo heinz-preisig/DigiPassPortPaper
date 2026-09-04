@@ -3,17 +3,24 @@
 \label{app:api-examples}
 % ===================================================================
 
-This appendix provides concrete examples of \API\ interactions covering the five operation groups defined in Section~4.6.
+This appendix provides concrete examples of \API\ interactions covering the five
+operation groups defined in Section~4.6.
 
 \subsection{Example 1: \REO\ Submits a New \DPP}
 
-An economic operator (EO) submits a new \DPP\ for a battery batch. The interaction proceeds as follows:
+An economic operator (EO) submits a new \DPP\ for a battery batch. The
+interaction proceeds as follows:
 
 \begin{enumerate}
-\item \textbf{Authenticate}: The \EO\ presents its \eIDAS~2.0 credential to obtain a bearer token.
-\item \textbf{Submit DPP}: The \EO\ submits the signed \JSONLD\ \DPP\ via POST \texttt{/dpps}.
-\item \textbf{Ingestion}: The portal controller validates the \DPP\ against \SHACL\ shapes, verifies the cryptographic signature, normalises external entity references, and commits the \DPP\ to the triple-store.
-\item \textbf{Register}: The \EO\ registers the \DPP\ with the EC central registry via POST \texttt{/dpps/\{dppId\}/register}.
+\item \textbf{Authenticate}: The \EO\ presents its \eIDAS~2.0 credential to
+obtain a bearer token.
+\item \textbf{Submit DPP}: The \EO\ submits the signed \JSONLD\ \DPP\ via POST
+\texttt{/dpps}.
+\item \textbf{Ingestion}: The portal controller validates the \DPP\ against
+\SHACL\ shapes, verifies the cryptographic signature, normalises external entity
+references, and commits the \DPP\ to the triple-store.
+\item \textbf{Register}: The \EO\ registers the \DPP\ with the EC central
+registry via POST \texttt{/dpps/\{dppId\}/register}.
 \end{enumerate}
 
 \begin{lstlisting}[language=bash,breaklines=true,breakatwhitespace=true]
@@ -48,12 +55,19 @@ urn:dpp:product:batch-2026-001/register \
 
 \subsection{Example 2: Consumer Scans \QR\ Code and Reads Public \DPP}
 
-A consumer scans a \QR\ code on a product and requests the public-facing \DPP\ data. The interaction proceeds as follows:
+A consumer scans a \QR\ code on a product and requests the public-facing \DPP\
+data. The interaction proceeds as follows:
 
 \begin{enumerate}
-\item \textbf{Authenticate}: The consumer's app presents a lightweight \eIDAS~2.0 credential (no organisational identity required) to obtain a \texttt{dpp:PublicUser} bearer token.
-\item \textbf{Resolve \DPP}: The consumer's app requests the DPP via GET \texttt{/dpps/\{dppId\}}.
-\item \textbf{Filter}: The portal controller evaluates ODRL policies against the \texttt{dpp:PublicUser} attributes and returns only the public-facing branches (product name, basic composition summary, environmental impact indicators, repairability information, recycling instructions).
+\item \textbf{Authenticate}: The consumer's app presents a lightweight
+\eIDAS~2.0 credential (no organisational identity required) to obtain a
+\texttt{dpp:PublicUser} bearer token.
+\item \textbf{Resolve \DPP}: The consumer's app requests the DPP via GET
+\texttt{/dpps/\{dppId\}}.
+\item \textbf{Filter}: The portal controller evaluates ODRL policies against the
+\texttt{dpp:PublicUser} attributes and returns only the public-facing branches
+(product name, basic composition summary, environmental impact indicators,
+repairability information, recycling instructions).
 \end{enumerate}
 
 \begin{lstlisting}[language=bash,breaklines=true,breakatwhitespace=true]
@@ -80,12 +94,21 @@ urn:dpp:product:batch-2026-001 \
 
 \subsection{Example 3: Circular Operator Traverses Supply Chain}
 
-A certified recycler needs the full material composition and disassembly information for a product at end-of-life. The interaction proceeds as follows:
+A certified recycler needs the full material composition and disassembly
+information for a product at end-of-life. The interaction proceeds as follows:
 
 \begin{enumerate}
-\item \textbf{Authenticate}: The recycler presents its \eIDAS~2.0 credential (including waste management permits and recycling certifications as \WthreeC\ Verifiable Credentials) to obtain a \texttt{dpp:CircularOperator} bearer token.
-\item \textbf{Resolve \DPP}: The recycler requests the \DPP via GET \texttt{/dpps/\{dppId\}}. The portal returns a filtered sub-graph including the full composition data, hazard statements, and disassembly instructions.
-\item \textbf{Traverse Supply Chain}: The recycler requests the full supply chain via GET \texttt{/dpps/\{dppId\}/supplychain}. The portal recursively follows \texttt{dpp:hasPrecursor} links and returns an aggregated JSON-LD graph containing all accessible precursor \DPPs, each filtered according to the recycler's access rights.
+\item \textbf{Authenticate}: The recycler presents its \eIDAS~2.0 credential
+(including waste management permits and recycling certifications as \WthreeC\
+Verifiable Credentials) to obtain a \texttt{dpp:CircularOperator} bearer token.
+\item \textbf{Resolve \DPP}: The recycler requests the \DPP via GET
+\texttt{/dpps/\{dppId\}}. The portal returns a filtered sub-graph including the
+full composition data, hazard statements, and disassembly instructions.
+\item \textbf{Traverse Supply Chain}: The recycler requests the full supply
+chain via GET \texttt{/dpps/\{dppId\}/supplychain}. The portal recursively
+follows \texttt{dpp:hasPrecursor} links and returns an aggregated JSON-LD graph
+containing all accessible precursor \DPPs, each filtered according to the
+recycler's access rights.
 \end{enumerate}
 
 \begin{lstlisting}[language=bash,breaklines=true,breakatwhitespace=true]
@@ -130,13 +153,21 @@ urn:dpp:product:batch-2026-001/supplychain \
 #   accessible precursor DPPs
 \end{lstlisting}
 
-\subsection{Example 4: Market Surveillance Authority Runs Cross-Product \SPARQL\ Query}
+\subsection{Example 4: Market Surveillance Authority Runs Cross-Product \SPARQL\
+Query}
 
-A market surveillance authority needs to identify all products in the portal that contain a specific substance of concern. The interaction proceeds as follows:
+A market surveillance authority needs to identify all products in the portal
+that contain a specific substance of concern. The interaction proceeds as
+follows:
 
 \begin{enumerate}
-\item \textbf{Authenticate}: The authority presents its \eIDAS~2.0 governmental credential to obtain a \texttt{dpp:MarketSurveillanceAuthority} bearer token.
-\item \textbf{\SPARQL\ Query}: The authority submits a \SPARQL\ CONSTRUCT query via POST \texttt{/sparql} that traverses all \DPPs\ in the portal and identifies those containing the target substance. The portal controller executes the query with full access rights (no \ODRL\ filtering for market surveillance authorities) and returns the aggregated result.
+\item \textbf{Authenticate}: The authority presents its \eIDAS~2.0 governmental
+credential to obtain a \texttt{dpp:MarketSurveillanceAuthority} bearer token.
+\item \textbf{\SPARQL\ Query}: The authority submits a \SPARQL\ CONSTRUCT query
+via POST \texttt{/sparql} that traverses all \DPPs\ in the portal and identifies
+those containing the target substance. The portal controller executes the query
+with full access rights (no \ODRL\ filtering for market surveillance
+authorities) and returns the aggregated result.
 \end{enumerate}
 
 \begin{lstlisting}[language=bash,breaklines=true,breakatwhitespace=true]
@@ -172,12 +203,22 @@ curl -X POST https://portal.example.eu/sparql \
 
 \subsection{Example 5: \REO\ Updates a \DPP\ After a Hazard Reclassification}
 
-\ECHA\ reclassifies a substance, adding it to the \SVHC\ candidate list. The \REO\ of a product containing that substance updates the \DPP\ to reflect the new classification. The interaction proceeds as follows:
+\ECHA\ reclassifies a substance, adding it to the \SVHC\ candidate list. The
+\REO\ of a product containing that substance updates the \DPP\ to reflect the
+new classification. The interaction proceeds as follows:
 
 \begin{enumerate}
-\item \textbf{Authenticate}: The \REO\ presents its \eIDAS~2.0 credential to obtain a \texttt{dpp:InternalDataOriginator} bearer token.
-\item \textbf{Retrieve \DPP}: The \REO\ retrieves the current \DPP\ via GET \texttt{/dpps/\{dppId\}} (with full access rights as the data originator).
-\item \textbf{Update \DPP}: The \REO\ submits the updated \DPP\ via PUT \texttt{/dpps/\{dppId\}} with the corrected substance reference (now linking to the updated \ECHA\ entry via the normalised \IRI). The portal controller re-validates the \DPP\ against \SHACL\ shapes, verifies the signature, and commits the updated version to the triple-store. All parent product \DPPs\ that reference this \DPP\ via \texttt{dpp:hasPrecursor} automatically reflect the updated classification upon subsequent resolution.
+\item \textbf{Authenticate}: The \REO\ presents its \eIDAS~2.0 credential to
+obtain a \texttt{dpp:InternalDataOriginator} bearer token.
+\item \textbf{Retrieve \DPP}: The \REO\ retrieves the current \DPP\ via GET
+\texttt{/dpps/\{dppId\}} (with full access rights as the data originator).
+\item \textbf{Update \DPP}: The \REO\ submits the updated \DPP\ via PUT
+\texttt{/dpps/\{dppId\}} with the corrected substance reference (now linking to
+the updated \ECHA\ entry via the normalised \IRI). The portal controller
+re-validates the \DPP\ against \SHACL\ shapes, verifies the signature, and
+commits the updated version to the triple-store. All parent product \DPPs\ that
+reference this \DPP\ via \texttt{dpp:hasPrecursor} automatically reflect the
+updated classification upon subsequent resolution.
 \end{enumerate}
 
 \begin{lstlisting}[language=bash,breaklines=true,breakatwhitespace=true]

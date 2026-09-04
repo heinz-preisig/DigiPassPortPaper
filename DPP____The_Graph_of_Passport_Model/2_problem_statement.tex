@@ -1,30 +1,113 @@
 % ===================================================================
-\section{Problem Statement: Systemic Risks in the Distributed Flat-File \DPP\ Model}
+\section{Problem Statement: Systemic Risks in the Distributed Flat-File \DPP\
+Model}
 % ===================================================================
 
 \subsection{Link Rot and Data Longevity}
 
-The \ESPR\ envisions \DPP\ data remaining accessible for the entire product lifecycle --- potentially decades. In the distributed model, \DPP\ data is hosted at \REO\ endpoints. When an \REO\ ceases operations, restructures, rebrands, or simply reorganises its \IT\ infrastructure, the \DPP\ endpoint may become unreachable. The central registry tracks the identifier-to-endpoint mapping, but it does not store the data itself. The \DPPforEU~2026 conference explicitly surfaced this concern, with a participant asking ``\textit{how do you store these data for decades and make them accessible, for example, to recyclers?}''~\cite{conf_persistency}. The distributed model offers no structural solution. Each \REO\ endpoint is a single point of failure for the \DPPs\ it hosts. Over decades, across millions of products and hundreds of thousands of \REOs, the cumulative effect is a progressive decay of accessible \DPP\ data --- \textbf{link rot at ecosystem scale}.
+The \ESPR\ envisions \DPP\ data remaining accessible for the entire product
+lifecycle --- potentially decades. In the distributed model, \DPP\ data is
+hosted at \REO\ endpoints. When an \REO\ ceases operations, restructures,
+rebrands, or simply reorganises its \IT\ infrastructure, the \DPP\ endpoint may
+become unreachable. The central registry tracks the identifier-to-endpoint
+mapping, but it does not store the data itself. The \DPPforEU~2026 conference
+explicitly surfaced this concern, with a participant asking ``\textit{how do you
+store these data for decades and make them accessible, for example, to
+recyclers?}''~\cite{conf_persistency}. The distributed model offers no
+structural solution. Each \REO\ endpoint is a single point of failure for the
+\DPPs\ it hosts. Over decades, across millions of products and hundreds of
+thousands of \REOs, the cumulative effect is a progressive decay of accessible
+\DPP\ data --- \textbf{link rot at ecosystem scale}.
 
 \subsection{Business Continuity}
 
-Related to link rot is the broader issue of business continuity. When a company is acquired, dissolved, or restructured, its \DPP\ endpoints may not be maintained. The data --- composition information, hazard data, supply chain provenance --- does not transfer automatically to a successor entity. For circular economy operators attempting to recycle a product 15~years after manufacture, the \DPP\ may simply not exist anymore. A conference participant from the Materials Commons initiative acknowledged this gap, noting that while the initiative provides ``\textit{infrastructure and governance of a federated software system which is capable of storing this kind of data and making it accessible},'' what Materials Commons does not do is ``\textit{run servers in the end}''~\cite{conf_materials_commons}. This reveals a structural tension: the community recognises the need for governed, persistent storage, but the federated approach explicitly stops short of providing it. The gap between recognising the need for persistent storage and actually providing it is precisely the gap that the portal-backed architecture fills.
+Related to link rot is the broader issue of business continuity. When a company
+is acquired, dissolved, or restructured, its \DPP\ endpoints may not be
+maintained. The data --- composition information, hazard data, supply chain
+provenance --- does not transfer automatically to a successor entity. For
+circular economy operators attempting to recycle a product 15~years after
+manufacture, the \DPP\ may simply not exist anymore. A conference participant
+from the Materials Commons initiative acknowledged this gap, noting that while
+the initiative provides ``\textit{infrastructure and governance of a federated
+software system which is capable of storing this kind of data and making it
+accessible},'' what Materials Commons does not do is ``\textit{run servers in
+the end}''~\cite{conf_materials_commons}. This reveals a structural tension: the
+community recognises the need for governed, persistent storage, but the
+federated approach explicitly stops short of providing it. The gap between
+recognising the need for persistent storage and actually providing it is
+precisely the gap that the portal-backed architecture fills.
 
 \subsection{Cyberattack Exposure}
 
-In the distributed model, each \REO\ endpoint is a potential attack surface. \DPP\ endpoints, by design, must be publicly resolvable (at least for public data branches). This makes them visible targets for denial-of-service attacks, data tampering, and supply chain poisoning attacks. A compromised \REO\ endpoint could serve falsified \DPP\ data --- incorrect composition declarations, fabricated certificates, or altered hazard classifications. The scale of the attack surface is proportional to the number of \REOs --- potentially hundreds of thousands across the European single market. Centralised monitoring and incident response across such a distributed landscape is structurally difficult. Conference participants also raised concerns about the integrity of data carriers, with one speaker noting the need to ``\textit{make sure that whatever the code is it goes to the correct destination}'' and that ``\textit{there is a method to detect that there is a clone}''~\cite{conf_phishing}. The emphasis on offline and online verification of data carriers reflects an awareness that the current distributed architecture creates verification challenges that a federated portal with unified cryptographic validation could address more robustly.
+In the distributed model, each \REO\ endpoint is a potential attack surface.
+\DPP\ endpoints, by design, must be publicly resolvable (at least for public
+data branches). This makes them visible targets for denial-of-service attacks,
+data tampering, and supply chain poisoning attacks. A compromised \REO\ endpoint
+could serve falsified \DPP\ data --- incorrect composition declarations,
+fabricated certificates, or altered hazard classifications. The scale of the
+attack surface is proportional to the number of \REOs --- potentially hundreds
+of thousands across the European single market. Centralised monitoring and
+incident response across such a distributed landscape is structurally difficult.
+Conference participants also raised concerns about the integrity of data
+carriers, with one speaker noting the need to ``\textit{make sure that whatever
+the code is it goes to the correct destination}'' and that ``\textit{there is a
+method to detect that there is a clone}''~\cite{conf_phishing}. The emphasis on
+offline and online verification of data carriers reflects an awareness that the
+current distributed architecture creates verification challenges that a
+federated portal with unified cryptographic validation could address more
+robustly.
 
 \subsection{Intellectual Property Leakage}
 
-The \ESPR\ mandates that \DPPs\ carry composition and supply chain data. However, much of this data is commercially sensitive --- formulation details, supplier identities, process parameters. Industry resistance to sharing proprietary composition data through a system that exposes it to competitors is well documented. The distributed flat-file model does not inherently provide branch-level access control. An \REO\ endpoint either serves the complete \DPP\ payload or it does not. Granular, attribute-based filtering of data branches based on the requester's identity and role is not a native feature of the current architectural blueprint. Conference participants raised exactly this concern, asking \textit{''who indeed will have the access for the full information and data and how it could be managed''}~\cite{conf_access_management}. The \JTC~24 standards attempt to address this by providing an environment for access rights management, but the standards only define the framework --- the actual enforcement mechanism at the data layer remains unresolved~\cite{conf_jtc24_access}.
+The \ESPR\ mandates that \DPPs\ carry composition and supply chain data.
+However, much of this data is commercially sensitive --- formulation details,
+supplier identities, process parameters. Industry resistance to sharing
+proprietary composition data through a system that exposes it to competitors is
+well documented. The distributed flat-file model does not inherently provide
+branch-level access control. An \REO\ endpoint either serves the complete \DPP\
+payload or it does not. Granular, attribute-based filtering of data branches
+based on the requester's identity and role is not a native feature of the
+current architectural blueprint. Conference participants raised exactly this
+concern, asking \textit{''who indeed will have the access for the full
+information and data and how it could be
+managed''}~\cite{conf_access_management}. The \JTC~24 standards attempt to
+address this by providing an environment for access rights management, but the
+standards only define the framework --- the actual enforcement mechanism at the
+data layer remains unresolved~\cite{conf_jtc24_access}.
 
 \subsection{The Media Break Problem: From \PDF\ to Machine-Readable Data}
 
-A further systemic risk in the current model is what standards practitioners describe as ``media breaks'' --- the loss of semantic content when data transitions between representation formats. As a \JTC~24 representative noted at the conference: ``\textit{our \API\ are semi-formal but for implementation need full formality so this means our documents are having media breaks}''~\cite{conf_media_break}. The current reliance on \PDF\ as a delivery format for standards and \DPP\ data compounds this problem. As a participant from the German quality infrastructure stated, data ``\textit{delivered as a \PDF\ they don't really help. So we want to have them databased}''~\cite{conf_pdf}. This media break between the semantic aspirations of the \DPP\ ecosystem and the non-semantic reality of current data delivery creates a structural gap that the portal-backed graph architecture addresses by storing \DPP\ data natively as \RDF\ graphs within a triple-store, eliminating the format conversion problem entirely.
+A further systemic risk in the current model is what standards practitioners
+describe as ``media breaks'' --- the loss of semantic content when data
+transitions between representation formats. As a \JTC~24 representative noted at
+the conference: ``\textit{our \API\ are semi-formal but for implementation need
+full formality so this means our documents are having media
+breaks}''~\cite{conf_media_break}. The current reliance on \PDF\ as a delivery
+format for standards and \DPP\ data compounds this problem. As a participant
+from the German quality infrastructure stated, data ``\textit{delivered as a
+\PDF\ they don't really help. So we want to have them
+databased}''~\cite{conf_pdf}. This media break between the semantic aspirations
+of the \DPP\ ecosystem and the non-semantic reality of current data delivery
+creates a structural gap that the portal-backed graph architecture addresses by
+storing \DPP\ data natively as \RDF\ graphs within a triple-store, eliminating
+the format conversion problem entirely.
 
 \subsection{The Machine-Readable Regulation Gap}
 
-A deeper structural problem emerged in the conference discussions: the \DPP\ alone is insufficient without machine-readable regulation against which \DPP\ data can be checked. As a \JTC~24 representative observed: \textit{''the machine-readable product data must become checkable by machine-readable regulation and legal text. This is future music''}~\cite{conf_machine_regulation}. Without this capability, \textit{''you still have to look in the book whether what you see on the screen is actually according to requirements''}~\cite{conf_checkable}. This observation highlights that the distributed flat-file model addresses only half of the equation --- making product data machine-readable --- while leaving the regulatory checking side unresolved. A portal-backed architecture with a triple store could, in principle, host both \DPP\ graphs and machine-readable regulatory shapes (expressed, for example, as \SHACL\ constraints), enabling automated compliance checking within a single semantic framework.
+A deeper structural problem emerged in the conference discussions: the \DPP\
+alone is insufficient without machine-readable regulation against which \DPP\
+data can be checked. As a \JTC~24 representative observed: \textit{''the
+machine-readable product data must become checkable by machine-readable
+regulation and legal text. This is future
+music''}~\cite{conf_machine_regulation}. Without this capability, \textit{''you
+still have to look in the book whether what you see on the screen is actually
+according to requirements''}~\cite{conf_checkable}. This observation highlights
+that the distributed flat-file model addresses only half of the equation ---
+making product data machine-readable --- while leaving the regulatory checking
+side unresolved. A portal-backed architecture with a triple store could, in
+principle, host both \DPP\ graphs and machine-readable regulatory shapes
+(expressed, for example, as \SHACL\ constraints), enabling automated compliance
+checking within a single semantic framework.
 
 \subsection{Summary of Systemic Risks}
 
@@ -34,21 +117,32 @@ A deeper structural problem emerged in the conference discussions: the \DPP\ alo
 \label{tab:risks}
 \begin{tabular}{p{0.22\textwidth} p{0.36\textwidth} p{0.36\textwidth}}
 \toprule
-\textbf{Risk Category} & \textbf{Distributed Flat-File Model} & \textbf{Portal-Backed Graph Model (Proposed)} \\
+\textbf{Risk Category} & \textbf{Distributed Flat-File Model} &
+\textbf{Portal-Backed Graph Model (Proposed)} \\
 \midrule
-Link rot & Each \REO\ is a single point of failure; data decays over time & Portal stores data persistently; no dependency on \REO\ availability \\
+Link rot & Each \REO\ is a single point of failure; data decays over time &
+Portal stores data persistently; no dependency on \REO\ availability \\
 \addlinespace
-Business continuity & \DPP\ data lost when \REO\ ceases operations & \DPP\ data persists in portal; independent of \REO\ lifecycle \\
+Business continuity & \DPP\ data lost when \REO\ ceases operations & \DPP\ data
+persists in portal; independent of \REO\ lifecycle \\
 \addlinespace
-Cyberattack exposure & Hundreds of thousands of endpoints, each a target & Federated portal with unified security posture \\
+Cyberattack exposure & Hundreds of thousands of endpoints, each a target &
+Federated portal with unified security posture \\
 \addlinespace
-\IP\ leakage & Binary access --- full payload or nothing & Branch-level \ABAC\ with \ODRL\ policies; selective visibility \\
+\IP\ leakage & Binary access --- full payload or nothing & Branch-level \ABAC\
+with \ODRL\ policies; selective visibility \\
 \addlinespace
-Media breaks & \PDF\ delivery loses semantic content & Native \RDF\ storage eliminates format conversion \\
+Media breaks & \PDF\ delivery loses semantic content & Native \RDF\ storage
+eliminates format conversion \\
 \addlinespace
-Regulatory checking & Manual interpretation required; ``future music'' & \SHACL\ shapes enable automated compliance checking \\
+Regulatory checking & Manual interpretation required; ``future music'' & \SHACL\
+shapes enable automated compliance checking \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The evidence from the \DPPforEU~2026 conference transcripts demonstrates that these risks are not merely theoretical concerns identified by this paper. They are actively discussed, debated, and left unresolved by the practitioner community. The following sections present an architectural response to each of these risks.
+The evidence from the \DPPforEU~2026 conference transcripts demonstrates that
+these risks are not merely theoretical concerns identified by this paper. They
+are actively discussed, debated, and left unresolved by the practitioner
+community. The following sections present an architectural response to each of
+these risks.

@@ -4,39 +4,130 @@
 
 \subsection{The Need for Granular Access Control}
 
-The \ESPR\ mandates that \DPPs\ serve multiple user categories with different information needs and access rights. A consumer scanning a \QR\ code on a product needs access to public-facing information about composition, repairability, and environmental impact. A professional user --- a repair technician, a product designer, or a supply chain partner --- needs access to technical specifications and component data. A circular economy operator --- a recycler or a remanufacturer --- needs access to detailed material composition and hazard data. A market surveillance authority needs access to compliance documentation and full supply chain provenance. The Responsible Economic Operator (REO) who authored the \DPP\ needs access to the complete data record, including proprietary formulation details. The distributed flat-file model does not inherently support this granularity: an \ERO\ endpoint either serves the complete \DPP\ payload or a subset, but without a formal framework for attribute-based, branch-level filtering. As a representative from the battery passport context described at the \DPPforEU~2026 conference (see Section~1.4), the requirement is that the actor is authenticated and authorised so that they see only the data they are permitted to access --- nothing more. This is precisely the behaviour that the Attribute-Based Access Control (\ABAC) framework presented in this section implements, following the \NIST\ Attribute-Based Access Control definition~\cite{abac_nist} adapted to the \DPP\ context.
+The \ESPR\ mandates that \DPPs\ serve multiple user categories with different
+information needs and access rights. A consumer scanning a \QR\ code on a
+product needs access to public-facing information about composition,
+repairability, and environmental impact. A professional user --- a repair
+technician, a product designer, or a supply chain partner --- needs access to
+technical specifications and component data. A circular economy operator --- a
+recycler or a remanufacturer --- needs access to detailed material composition
+and hazard data. A market surveillance authority needs access to compliance
+documentation and full supply chain provenance. The Responsible Economic
+Operator (REO) who authored the \DPP\ needs access to the complete data record,
+including proprietary formulation details. The distributed flat-file model does
+not inherently support this granularity: an \REO\ endpoint either serves the
+complete \DPP\ payload or a subset, but without a formal framework for
+attribute-based, branch-level filtering. As a representative from the battery
+passport context described at the \DPPforEU~2026 conference (see Section~1.4),
+the requirement is that the actor is authenticated and authorised so that they
+see only the data they are permitted to access --- nothing more. This is
+precisely the behaviour that the Attribute-Based Access Control (\ABAC)
+framework presented in this section implements, following the \NIST\
+Attribute-Based Access Control definition~\cite{abac_nist} adapted to the \DPP\
+context.
 
 \subsection{Five Standardised User Categories}
 
-We define five standardised user categories within the \DPP\ access governance framework, each with a distinct set of attributes, permissions, and authentication requirements.
+We define five standardised user categories within the \DPP\ access governance
+framework, each with a distinct set of attributes, permissions, and
+authentication requirements.
 
 \subsubsection{\texttt{dpp:PublicUser}}
 
-The public user category encompasses consumers and any individual accessing \DPP\ data without formal organisational affiliation. Access is limited to public-facing data branches: product name, basic composition summary, environmental impact indicators, repairability information, and recycling instructions. Authentication is lightweight --- the \EC\ Authorisation App verifies the request origin but does not require organisational identity. No sensitive commercial data, supply chain details, or proprietary formulations are exposed to this category.
+The public user category encompasses consumers and any individual accessing
+\DPP\ data without formal organisational affiliation. Access is limited to
+public-facing data branches: product name, basic composition summary,
+environmental impact indicators, repairability information, and recycling
+instructions. Authentication is lightweight --- the \EC\ Authorisation App
+verifies the request origin but does not require organisational identity. No
+sensitive commercial data, supply chain details, or proprietary formulations are
+exposed to this category.
 
 \subsubsection{\texttt{dpp:ProfessionalUser}}
 
-The professional user category encompasses repair technicians, product designers, supply chain partners, and other economic operators with a legitimate professional interest in the product's \DPP\ data. Access includes technical specifications, component identifiers, supplier information (at the organisational level), and compliance documentation. Authentication requires organisational identity verification through the trust tier matrix (Section~5.5). Access is granted on a need-to-know basis~\cite{dpp4eu2026_day1}, reflecting the conference observation that professional users ``\textit{will never get the full access or they shouldn't get the full access}'' to all data in the \DPP~\cite{dpp4eu2026_day1}.
+The professional user category encompasses repair technicians, product
+designers, supply chain partners, and other economic operators with a legitimate
+professional interest in the product's \DPP\ data. Access includes technical
+specifications, component identifiers, supplier information (at the
+organisational level), and compliance documentation. Authentication requires
+organisational identity verification through the trust tier matrix
+(Section~5.5). Access is granted on a need-to-know basis~\cite{dpp4eu2026_day1},
+reflecting the conference observation that professional users ``\textit{will
+never get the full access or they shouldn't get the full access}'' to all data
+in the \DPP~\cite{dpp4eu2026_day1}.
 
 \subsubsection{\texttt{dpp:CircularOperator}}
 
-The circular operator category encompasses recyclers, remanufacturers, and waste management operators who need detailed material composition, hazard classifications, and disassembly information to safely and effectively recover materials from end-of-life products. Access includes full composition data (including substances of concern), hazard statements, and disassembly instructions. Authentication requires both organisational identity and competence verification --- the operator must demonstrate that it is a legitimate circular economy actor with the appropriate certifications and authorisations for handling the materials in question. This category directly addresses the data persistency concern discussed in Section~2.1. The portal-backed architecture ensures that circular operators can access this data decades after manufacture, provided their credentials remain valid.
+The circular operator category encompasses recyclers, remanufacturers, and waste
+management operators who need detailed material composition, hazard
+classifications, and disassembly information to safely and effectively recover
+materials from end-of-life products. Access includes full composition data
+(including substances of concern), hazard statements, and disassembly
+instructions. Authentication requires both organisational identity and
+competence verification --- the operator must demonstrate that it is a
+legitimate circular economy actor with the appropriate certifications and
+authorisations for handling the materials in question. This category directly
+addresses the data persistency concern discussed in Section~2.1. The
+portal-backed architecture ensures that circular operators can access this data
+decades after manufacture, provided their credentials remain valid.
 
 \subsubsection{\texttt{dpp:MarketSurveillanceAuthority}}
 
-The market surveillance authority category encompasses national regulatory bodies responsible for verifying product compliance with applicable regulations. Access includes the full \DPP\ record: all data branches, all supply chain provenance, all compliance documentation, and all \REO\ declarations. Authentication requires governmental identity verification through \eIDAS~2.0 public sector identity credentials. This category has the broadest access rights, reflecting the regulatory mandate of market surveillance authorities under the ESPR. Full access is granted to authenticated regulatory bodies, and only to them, answering the conference question about who should have access to the full information~\cite{dpp4eu2026_day1}.
+The market surveillance authority category encompasses national regulatory
+bodies responsible for verifying product compliance with applicable regulations.
+Access includes the full \DPP\ record: all data branches, all supply chain
+provenance, all compliance documentation, and all \REO\ declarations.
+Authentication requires governmental identity verification through \eIDAS~2.0
+public sector identity credentials. This category has the broadest access
+rights, reflecting the regulatory mandate of market surveillance authorities
+under the ESPR. Full access is granted to authenticated regulatory bodies, and
+only to them, answering the conference question about who should have access to
+the full information~\cite{dpp4eu2026_day1}.
 
 \subsubsection{\texttt{dpp:InternalDataOriginator}}
 
-The internal data originator category encompasses the \REO\ that authored and submitted the \DPP. Access includes the complete \DPP\ record plus internal metadata: submission history, validation results, cryptographic signatures, and provenance logs. This category is unique in that it includes both the public and restricted data branches that the \REO\ authored, plus internal management data. Authentication requires the \REO's registered organisational identity and cryptographic key, bound through the trust tier matrix. This category enables the \REO\ to manage its own \DPPs: update data, correct errors, submit new versions, and monitor access logs.
+The internal data originator category encompasses the \REO\ that authored and
+submitted the \DPP. Access includes the complete \DPP\ record plus internal
+metadata: submission history, validation results, cryptographic signatures, and
+provenance logs. This category is unique in that it includes both the public and
+restricted data branches that the \REO\ authored, plus internal management data.
+Authentication requires the \REO's registered organisational identity and
+cryptographic key, bound through the trust tier matrix. This category enables
+the \REO\ to manage its own \DPPs: update data, correct errors, submit new
+versions, and monitor access logs.
 
 \subsection{\ODRL\ Branch-Level Access Policies}
 
-The \ABAC\ framework evaluates access decisions based on attributes of three entities: the \textbf{subject} (the requester, characterized by user category, organisational identity, jurisdiction, and certifications), the \textbf{object} (the \DPP\ data branch, characterized by its classification, sensitivity level, regulatory context, and applicable policies), and the \textbf{environment} (the request context, including time, jurisdiction, and active legal exceptions). This model follows the \NIST\ Attribute-Based Access Control definition~\cite{abac_nist}, adapted to the \DPP\ context. Access policies are encoded using the \WthreeC\ Open Digital Rights Language (\ODRL)~\cite{odrl_spec}, attached to individual branches within each \DPP's RDF named graph. Each data branch in a \DPP\ carries one or more \ODRL\ policies that specify which user categories may access it, under what conditions, and for what purposes. For example, a public-facing composition summary branch carries an \ODRL\ policy permitting access to all user categories. A proprietary formulation branch carries an \ODRL\ policy permitting access only to \\ \texttt{dpp:InternalDataOriginator} and \\ \texttt{dpp:MarketSurveillanceAuthority}. \\A supplier identity branch carries an \ODRL\ policy permitting access to \\ \texttt{dpp:ProfessionalUser}, \\ \texttt{dpp:CircularOperator}, \\ \texttt{dpp:MarketSurveillanceAuthority}, and \\ \texttt{dpp:InternalDataOriginator}, but not to \texttt{dpp:PublicUser}. \\ This branch-level policy attachment enables fine-grained access control that is not possible with binary, endpoint-level access models, directly addressing the conference concern about transferring confidential data only to authorised parties~\cite{dpp4eu2026_day1}.
+The \ABAC\ framework evaluates access decisions based on attributes of three
+entities: the \textbf{subject} (the requester, characterized by user category,
+organisational identity, jurisdiction, and certifications), the \textbf{object}
+(the \DPP\ data branch, characterized by its classification, sensitivity level,
+regulatory context, and applicable policies), and the \textbf{environment} (the
+request context, including time, jurisdiction, and active legal exceptions).
+This model follows the \NIST\ Attribute-Based Access Control
+definition~\cite{abac_nist}, adapted to the \DPP\ context. Access policies are
+encoded using the \WthreeC\ Open Digital Rights Language
+(\ODRL)~\cite{odrl_spec}, attached to individual branches within each \DPP's RDF
+named graph. Each data branch in a \DPP\ carries one or more \ODRL\ policies
+that specify which user categories may access it, under what conditions, and for
+what purposes. For example, a public-facing composition summary branch carries
+an \ODRL\ policy permitting access to all user categories. A proprietary
+formulation branch carries an \ODRL\ policy permitting access only to \\
+\texttt{dpp:InternalDataOriginator} and \\
+\texttt{dpp:MarketSurveillanceAuthority}. \\A supplier identity branch carries
+an \ODRL\ policy permitting access to \\ \texttt{dpp:ProfessionalUser}, \\
+\texttt{dpp:CircularOperator}, \\ \texttt{dpp:MarketSurveillanceAuthority}, and
+\\ \texttt{dpp:InternalDataOriginator}, but not to \texttt{dpp:PublicUser}. \\
+This branch-level policy attachment enables fine-grained access control that is
+not possible with binary, endpoint-level access models, directly addressing the
+conference concern about transferring confidential data only to authorised
+parties~\cite{dpp4eu2026_day1}.
 
 \subsubsection{Example \ODRL\ Policy}
 
-The following \ODRL\ policy, expressed in \JSONLD, attaches to a proprietary formulation branch within a \DPP, restricting access to the internal data originator and market surveillance authorities:
+The following \ODRL\ policy, expressed in \JSONLD, attaches to a proprietary
+formulation branch within a \DPP, restricting access to the internal data
+originator and market surveillance authorities:
 
 \begin{lstlisting}[language=jsonld]
 {
@@ -63,55 +154,143 @@ The following \ODRL\ policy, expressed in \JSONLD, attaches to a proprietary for
 }
 \end{lstlisting}
 
-This policy states that the \texttt{odrl:read} action on the formulation branch is permitted for \\ \texttt{dpp:InternalDataOriginator} and \\ \texttt{dpp:MarketSurveillanceAuthority} subjects, \\ provided the regulatory context is ESPR. The portal controller evaluates this policy during the Resolution Governance Loop (Section~4.3) when a requester attempts to access this branch.
+This policy states that the \texttt{odrl:read} action on the formulation branch
+is permitted for \\ \texttt{dpp:InternalDataOriginator} and \\
+\texttt{dpp:MarketSurveillanceAuthority} subjects, \\ provided the regulatory
+context is ESPR. The portal controller evaluates this policy during the
+Resolution Governance Loop (Section~4.3) when a requester attempts to access
+this branch.
 
 \subsection{Dynamic \SPARQL\ CONSTRUCT Filtering}
 
-The Resolution Governance Loop implements the \ABAC\ framework through dynamic \SPARQL\ \texttt{CONSTRUCT} queries. When a requester accesses a \DPP, the portal controller:
+The Resolution Governance Loop implements the \ABAC\ framework through dynamic
+\SPARQL\ \texttt{CONSTRUCT} queries. When a requester accesses a \DPP, the
+portal controller:
 
 \begin{enumerate}
 \item Authenticates the requester via the \EC\ Authorisation App (Section~5.6).
-\item Retrieves the requester's attributes (user category, organisation, jurisdiction, certifications).
+\item Retrieves the requester's attributes (user category, organisation,
+jurisdiction, certifications).
 \item Retrieves the \DPP's named graph from the triple-store.
-\item Evaluates the \ODRL\ policies attached to each data branch against the requester's attributes.
-\item Constructs a filtered sub-graph containing only the branches for which the \ODRL\ evaluation returns \texttt{Permit}.
+\item Evaluates the \ODRL\ policies attached to each data branch against the
+requester's attributes.
+\item Constructs a filtered sub-graph containing only the branches for which the
+\ODRL\ evaluation returns \texttt{Permit}.
 \item Serialises and returns the filtered graph to the requester.
 \end{enumerate}
 
-This dynamic, query-time filtering ensures that access policies are always evaluated against the most current \ODRL\ policies and the most current requester attributes. If a policy is updated (e.g., a new regulation expands circular operator access to additional data branches), the update takes effect immediately for all subsequent requests without requiring regeneration of stored views. The \SPARQL\ \texttt{CONSTRUCT} mechanism is well suited to this task because it operates natively on \RDF\ graphs and can express arbitrarily complex filtering conditions over both data and policy metadata.
+This dynamic, query-time filtering ensures that access policies are always
+evaluated against the most current \ODRL\ policies and the most current
+requester attributes. If a policy is updated (e.g., a new regulation expands
+circular operator access to additional data branches), the update takes effect
+immediately for all subsequent requests without requiring regeneration of stored
+views. The \SPARQL\ \texttt{CONSTRUCT} mechanism is well suited to this task
+because it operates natively on \RDF\ graphs and can express arbitrarily complex
+filtering conditions over both data and policy metadata.
 
 \subsection{The Trust Tier Matrix}
 
-Before a user can be assigned to one of the five categories and granted access to \DPP\ data, their identity and qualifications must be verified through a three-pillar trust tier matrix.
+Before a user can be assigned to one of the five categories and granted access
+to \DPP\ data, their identity and qualifications must be verified through a
+three-pillar trust tier matrix.
 
 \subsubsection{Pillar 1: Legal Existence Verification}
 
-The first pillar verifies that the organisation requesting access is a legally registered economic operator. This is performed through lookup in the European Economic Operators' Registration and Identification (EORI) system~\cite{eori_system} and the \VAT\ Information Exchange System (VIES)~\cite{vies_system}. The EORI number uniquely identifies an economic operator within the \EU\ customs and tax system, while \VIES\ confirms \VAT\ registration. 
+The first pillar verifies that the organisation requesting access is a legally
+registered economic operator. This is performed through lookup in the European
+Economic Operators' Registration and Identification (EORI)
+system~\cite{eori_system} and the \VAT\ Information Exchange System
+(VIES)~\cite{vies_system}. The EORI number uniquely identifies an economic
+operator within the \EU\ customs and tax system, while \VIES\ confirms \VAT\
+registration.
 \\
-For a \texttt{dpp:MarketSurveillanceAuthority}, legal existence is verified through the governmental identity registry of the member state. 
+For a \texttt{dpp:MarketSurveillanceAuthority}, legal existence is verified
+through the governmental identity registry of the member state.
 \\
-For a \texttt{dpp:PublicUser}, this pillar is not required (no organisational identity needed).
+For a \texttt{dpp:PublicUser}, this pillar is not required (no organisational
+identity needed).
 
 \subsubsection{Pillar 2: Competence Vetting}
 
-The second pillar verifies that the organisation has the competence and certifications required for its claimed user category. 
+The second pillar verifies that the organisation has the competence and
+certifications required for its claimed user category.
 \\
-For a \texttt{dpp:CircularOperator}, this includes waste management permits, recycling certifications, and hazardous material handling authorisations. 
+For a \texttt{dpp:CircularOperator}, this includes waste management permits,
+recycling certifications, and hazardous material handling authorisations.
 \\
-For a \texttt{dpp:ProfessionalUser}, this includes professional qualifications relevant to the product category (e.g., electronics repair certification, automotive technician license). Competence is verified through \WthreeC\ Verifiable Credentials~\cite{verifiable_credentials} issued by accredited certification bodies. The verifiable credentials are cryptographically signed by the issuer, stored in the requester's \eIDAS~2.0 digital identity wallet, and presented to the portal controller during authentication. This pillar realises the quality infrastructure community's emphasis on linking \DPPs\ to standards, measurements, and certificates (see Section~7.4): certifications are verifiable credentials, and their provenance is traceable to the issuing accreditation body.
+For a \texttt{dpp:ProfessionalUser}, this includes professional qualifications
+relevant to the product category (e.g., electronics repair certification,
+automotive technician license). Competence is verified through \WthreeC\
+Verifiable Credentials~\cite{verifiable_credentials} issued by accredited
+certification bodies. The verifiable credentials are cryptographically signed by
+the issuer, stored in the requester's \eIDAS~2.0 digital identity wallet, and
+presented to the portal controller during authentication. This pillar realises
+the quality infrastructure community's emphasis on linking \DPPs\ to standards,
+measurements, and certificates (see Section~7.4): certifications are verifiable
+credentials, and their provenance is traceable to the issuing accreditation
+body.
 
 \subsubsection{Pillar 3: Identity Binding via \eIDAS\ 2.0}
 
-The third pillar binds the organisational identity (Pillar~1) and the competence credentials (Pillar~2) to a verified natural person acting on behalf of the organisation. This is performed through \eIDAS~2.0~\cite{eidas2}, the European Digital Identity Framework, which provides a legally binding digital identity infrastructure across all \EU\ member states. The requester presents an \eIDAS~2.0 digital identity credential that links their natural person identity to their organisational role, and the portal controller verifies the binding. 
+The third pillar binds the organisational identity (Pillar~1) and the competence
+credentials (Pillar~2) to a verified natural person acting on behalf of the
+organisation. This is performed through \eIDAS~2.0~\cite{eidas2}, the European
+Digital Identity Framework, which provides a legally binding digital identity
+infrastructure across all \EU\ member states. The requester presents an
+\eIDAS~2.0 digital identity credential that links their natural person identity
+to their organisational role, and the portal controller verifies the binding.
 \\
-For a \texttt{dpp:MarketSurveillanceAuthority}, the \eIDAS~2.0 credential confirms governmental authority. 
+For a \texttt{dpp:MarketSurveillanceAuthority}, the \eIDAS~2.0 credential
+confirms governmental authority.
 \\
-For a \texttt{dpp:InternalDataOriginator}, the \eIDAS~2.0 credential confirms that the individual is authorised to submit \DPP\ data on behalf of the \REO. This three-pillar trust model ensures that access is granted only to verified organisations, with verified competence, acting through verified individuals --- a model that directly addresses the conference concern about data correctness and what is needed to prove that a data point is correct~\cite{dpp4eu2026_day1}.
+For a \texttt{dpp:InternalDataOriginator}, the \eIDAS~2.0 credential confirms
+that the individual is authorised to submit \DPP\ data on behalf of the \REO.
+This three-pillar trust model ensures that access is granted only to verified
+organisations, with verified competence, acting through verified individuals ---
+a model that directly addresses the conference concern about data correctness
+and what is needed to prove that a data point is correct~\cite{dpp4eu2026_day1}.
 
 \subsection{The \EC\ Authorisation App}
 
-The authentication and authorisation pipeline is managed by an \EC\ Authorisation App, which serves as the centralised identity gatekeeper for the \DPP\ system. The app leverages \eIDAS~2.0 digital identity wallets to establish requester identity, retrieves organisational identity and competence credentials from the requester's wallet, and evaluates them against the trust tier matrix. Upon successful verification, the app issues a short-lived authorisation token containing the requester's attributes (user category, organisation, jurisdiction, certifications), which the portal controller uses to evaluate \ODRL\ policies during the Resolution Governance Loop. This centralised model ensures uniform authentication across all member state portals, consistent evaluation of trust tier requirements, and a single point of policy enforcement. The conference concern about data carrier verification and phishing~\cite{dpp4eu2026_day1} is addressed at the data access layer: only authenticated, authorised requesters can access \DPP\ data, and impersonation attempts are structurally prevented by the \eIDAS~2.0 identity binding.
+The authentication and authorisation pipeline is managed by an \EC\
+Authorisation App, which serves as the centralised identity gatekeeper for the
+\DPP\ system. The app leverages \eIDAS~2.0 digital identity wallets to establish
+requester identity, retrieves organisational identity and competence credentials
+from the requester's wallet, and evaluates them against the trust tier matrix.
+Upon successful verification, the app issues a short-lived authorisation token
+containing the requester's attributes (user category, organisation,
+jurisdiction, certifications), which the portal controller uses to evaluate
+\ODRL\ policies during the Resolution Governance Loop. This centralised model
+ensures uniform authentication across all member state portals, consistent
+evaluation of trust tier requirements, and a single point of policy enforcement.
+The conference concern about data carrier verification and
+phishing~\cite{dpp4eu2026_day1} is addressed at the data access layer: only
+authenticated, authorised requesters can access \DPP\ data, and impersonation
+attempts are structurally prevented by the \eIDAS~2.0 identity binding.
 
 \subsection{Resolving the \IP\ Leakage Risk}
 
-The \ABAC\ framework with \ODRL\ branch-level policies directly resolves the intellectual property leakage risk identified in Section~2.4. In the distributed flat-file model, an \ERO\ endpoint serves the complete \DPP\ payload to any requester who reaches it, with no granular filtering. In the portal-backed model, the Resolution Governance Loop constructs a filtered sub-graph for each requester based on their attributes and the \ODRL\ policies attached to each branch. Proprietary formulation data, supplier identities, and process parameters are protected by \ODRL\ policies that restrict access to authorised user categories. A competitor who authenticates as a \texttt{dpp:ProfessionalUser} or \texttt{dpp:PublicUser} will see only the public and professional branches; the proprietary branches are filtered out by the \SPARQL\ \texttt{CONSTRUCT} query. The conference observation that ``\textit{this data really can be shared and if there's a compromise between confidentiality and transparency}''~\cite{dpp4eu2026_day1} is resolved by the \ABAC\ framework: the compromise is not a binary choice but a granular, policy-driven decision at the branch level. Each data branch can be independently classified, independently governed, and independently exposed or protected, based on the regulatory requirements and the commercial sensitivity of the data it contains. The transfer of intellectual property rights, identified as an open issue at the conference --- ``\textit{there's a transfer of \IPI. This is not covered yet in the standards because it's not quite clear how to organise this}''~\cite{dpp4eu2026_day1} --- can be modelled within this framework through \ODRL\ policies that specify \IPI-specific access conditions, updated dynamically as \IP\ rights transfer between organisations.
+The \ABAC\ framework with \ODRL\ branch-level policies directly resolves the
+intellectual property leakage risk identified in Section~2.4. In the distributed
+flat-file model, an \REO\ endpoint serves the complete \DPP\ payload to any
+requester who reaches it, with no granular filtering. In the portal-backed
+model, the Resolution Governance Loop constructs a filtered sub-graph for each
+requester based on their attributes and the \ODRL\ policies attached to each
+branch. Proprietary formulation data, supplier identities, and process
+parameters are protected by \ODRL\ policies that restrict access to authorised
+user categories. A competitor who authenticates as a
+\texttt{dpp:ProfessionalUser} or \texttt{dpp:PublicUser} will see only the
+public and professional branches; the proprietary branches are filtered out by
+the \SPARQL\ \texttt{CONSTRUCT} query. The conference observation that
+``\textit{this data really can be shared and if there's a compromise between
+confidentiality and transparency}''~\cite{dpp4eu2026_day1} is resolved by the
+\ABAC\ framework: the compromise is not a binary choice but a granular,
+policy-driven decision at the branch level. Each data branch can be
+independently classified, independently governed, and independently exposed or
+protected, based on the regulatory requirements and the commercial sensitivity
+of the data it contains. The transfer of intellectual property rights,
+identified as an open issue at the conference --- ``\textit{there's a transfer
+of \IPI. This is not covered yet in the standards because it's not quite clear
+how to organise this}''~\cite{dpp4eu2026_day1} --- can be modelled within this
+framework through \ODRL\ policies that specify \IPI-specific access conditions,
+updated dynamically as \IP\ rights transfer between organisations.

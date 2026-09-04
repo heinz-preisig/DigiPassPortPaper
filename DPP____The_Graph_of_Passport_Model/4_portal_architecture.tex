@@ -8,8 +8,8 @@ The central architectural proposal of this paper is that all \DPP\ data ---
 including product data originally provided by the Responsible Economic Operator
 (REO) --- is stored and maintained \textit{behind a federated portal}, rather
 than at distributed \REO\ endpoints. The portal acts as a \textbf{semantic proxy
-archive}: a federation of per-member-state triple-stores --- one per \EU\ member
-state --- that collectively ingest, validate, store, and serve \DPP\ data as
+archive}: a federation of per-member-state triple-stores --- one or several per
+\EU\ member state --- that collectively ingest, validate, store, and serve \DPP\ data as
 \RDF\ named graphs. Each national instance behaves identically in terms of \API,
 data model, and access governance, while operating on the data relevant to
 economic operators registered in that jurisdiction. Figure~\ref{fig:app-mech}
@@ -50,16 +50,23 @@ portal, and the portal serves the data.
 
 \subsection{Federation of National Portals}
 
-The federated portal model envisions one portal per \EU\ member state, each
-behaving identically in terms of \API, data model, and access governance, but
-operating on data relevant to economic operators registered in that
-jurisdiction. Thus, the portal is not a single central server: it is a
-federation of interoperable national portals, each storing and governing the
-\DPP\ data of economic operators registered in its jurisdiction. This federation
-addresses sovereignty concerns while maintaining architectural uniformity. A
-common portal specification provides a unified architectural baseline that
-proactively addresses the emergence of parallel approaches across jurisdictions,
-as called for by a JTC~24 conference participant.
+The federated portal model envisions one or several national portals per \EU\
+member state, all behaving identically in terms of \API, data model, and access
+governance. Each portal stores and governs the \DPP\ data of economic operators
+registered in its jurisdiction, but all portals in the federation speak the same
+specification and can query one another on demand. Thus, the portal is not a
+single central server: it is a federation of interoperable national portals.
+This federation addresses sovereignty concerns while maintaining architectural
+uniformity. A common portal specification provides a unified architectural
+baseline that proactively addresses the emergence of parallel approaches across
+jurisdictions, as called for by a JTC~24 conference participant.
+
+Links are used wherever possible: within a national portal, across the whole
+federation of portals on demand, and to the outside --- for example to \ECHA\
+for chemical substances, to standards bodies for norms and nomenclature, and to
+health and safety authorities for hazard and exposure information. All these
+links are materialised as persistent \IRIs, so that information remains
+resolvable independently of any single endpoint.
 
 \subsection{The Ingestion Governance Loop}
 
@@ -156,19 +163,20 @@ dynamic, query-time filtering rather than pre-computed views --- ensures that
 access policies can be updated without regenerating stored views, and that the
 most current policy is always applied.
 
-\subsubsection{Link Traversal Within the Portal}
+\subsubsection{Link Traversal Within and Across the Federation}
 
 When the filtered \DPP\ is returned to the requester, it may contain
-\texttt{dpp:hasPrecursor} and \texttt{dpp:derivedFrom} links to other \DPPs\
-within the portal. The requester may then request those linked \DPPs, which pass
-through the same Resolution Governance Loop. Critically, because all linked
-\DPPs\ reside within the same portal triple-store, link traversal never produces
-\texttt{404 Not Found} errors (unless a \DPP\ has been explicitly revoked). The
-link rot problem --- identified in Section~2 as a systemic risk of the
-distributed model --- is structurally eliminated. This architectural design
-directly answers the data persistency concern raised in Section~2.1: data
-persists because it is stored in a governed repository, not at an unmanaged
-endpoint.
+\texttt{dpp:hasPrecursor} and \texttt{dpp:derivedFrom} links to other \DPPs.
+Because every \DPP\ is identified by a persistent \IRI, the linked \DPP\ can
+reside in the same national portal, in another national portal of the same
+federation, or in an external authoritative registry such as \ECHA, a standards
+body, or a health and safety authority. The requester may then request those
+linked \DPPs\ on demand; each request passes through the same Resolution
+Governance Loop. This cross-portal link traversal is structurally reliable:
+because \DPPs\ are stored in governed repositories rather than at unmanaged
+endpoints, link rot is eliminated for all federation-internal links. External
+links remain resolvable as long as the authoritative source maintains the
+target \IRI, with the portal providing explicit provenance and access control.
 
 \subsection{Relationship to the \EC\ Central Registry}
 
@@ -196,7 +204,8 @@ alignment, entity normalisation.
 \item \textbf{Resolution governance}: \ABAC-based graph slicing, \SPARQL\
 CONSTRUCT filtering.
 \item \textbf{Link traversal}: resolving \texttt{dpp:hasPrecursor} and
-\texttt{dpp:derivedFrom} within the portal.
+\texttt{dpp:derivedFrom} within and across the federation, and to external
+registries.
 \end{itemize}
 
 This division of responsibility resolves the tension observed at \DPPforEU~2026,

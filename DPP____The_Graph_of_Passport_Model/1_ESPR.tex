@@ -62,8 +62,9 @@ and we're not going to rely on non-semantic representations like \PDF.''
 In contrast to the distributed, flat-file model, this paper proposes a
 \textbf{por\-tal-backed, network-structured \DPP\ architecture} built on
 semantic web standards. In this model, \DPPs\ are stored as linked graphs within
-a federation of per-member-state triple-stores, each acting as a semantic proxy
-archive, rather than as flat files at \EO\ endpoints. Individual \DPPs\
+a federation of per-member-state triple-stores, with one or several instances
+per member state, each acting as a semantic proxy archive, rather than as flat
+files at \EO\ endpoints. Individual \DPPs\
 reference their component predecessors via semantic properties
 (\texttt{dpp:hasPrecursor}, \texttt{dpp:derivedFrom}), forming a network of
 linked passports rather than a single monolithic supply chain record. Access

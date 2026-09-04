@@ -1,0 +1,174 @@
+% ===================================================================
+\section{The Networked Individual \DPP\ Model}
+% ===================================================================
+
+\subsection{From Monolithic Supply Chain Records to Linked Passports}
+
+A fundamental design choice in \DPP\ architecture is whether to represent a product's entire supply chain as a single monolithic record or as a network of linked individual passports. The current flat-file approach implicitly favours the monolithic model: a single \DPP\ document attempts to encode all upstream component data, material origins, and process information within a single payload. This approach has several structural limitations. First, \textbf{data staleness}: component data embedded at assembly time becomes stale if the component's \DPP\ is updated later (e.g., a corrected hazard classification or a supplier change). Second, \textbf{redundancy and inconsistency}: the same component data may be duplicated across multiple parent product \DPPs, leading to inconsistency when updates occur. Third, \textbf{size and complexity}: for products with deep, multi-tiered supply chains (e.g., a battery electric vehicle with thousands of components), a single monolithic \DPP\ becomes unwieldy. Fourth, \textbf{modularity breakdown}: as a representative of \JTC~24 noted at the \DPPforEU~2026 conference~\cite{dpp4eu2026_day1}, once a modular data model reaches hundreds or thousands of data points, dependencies between modules become extremely hard to track --- ``\textit{you don't really know what is going to happen to the whole ecosystem}'' if a single referenced data point is modified.
+
+The Networked Individual \DPP\ model proposes an alternative: each product, component, and material batch receives its own \DPP, and supply chain relationships are represented as \textbf{semantic links} between these individual passports. A parent product's \DPP\ does not embed its components' data; it simply references their \DPP\ \URIs. This approach mirrors the structure already recognised in the standards community. As a presenter from the University of Pavia described at \DPPforEU~2026~\cite{dpp4eu2026_day1}, information units --- documents, top-level documents, sections, and parts of sections --- are ``\textit{all represented uniformly as information units which can cite one another. An information unit can have one parent at most. This captures the hierarchical structure of standards and information units can be derived from one or more parent or one or more source information units}''. This description --- hierarchical structure, mutual citation, derivation from parent units --- is structurally identical to the semantic linking model proposed here for \DPPs.
+
+\subsection{Core Semantic Linking Properties}
+
+The Networked Individual \DPP\ model is built on three core semantic properties, expressed in \RDF/\RDFS\ vocabulary consistent with the architecture's \RDF\ foundation (Section~3). The use of \texttt{rdf:Property} with \texttt{rdfs:domain} and \texttt{rdfs:range} declarations --- rather than \OWL's \texttt{owl:ObjectProperty} and \texttt{owl:DatatypeProperty} --- reflects the deliberate choice of \RDF\ as the simplest, most generic representation for \DPP\ data.
+
+\subsubsection{\texttt{dpp:hasPrecursor} (The Assembly Link)}
+
+\begin{itemize}
+\item \textbf{Type}: \texttt{rdf:Property}
+\item \textbf{Domain}: \texttt{dpp:ProductPassport}
+\item \textbf{Range}: \texttt{dpp:ProductPassport}
+\item \textbf{Purpose}: Links a parent product \DPP\ to the \DPPs\ of its constituent components. It allows a query engine to crawl backwards through the production network recursively.
+\item \textbf{Cardinality}: One parent product may have many precursors; each precursor has exactly one parent product.
+\end{itemize}
+
+\subsubsection{\texttt{dpp:derivedFrom} (The Transformation Link)}
+
+\begin{itemize}
+\item \textbf{Type}: \texttt{rdf:Property}
+\item \textbf{Domain}: \texttt{dpp:ProductPassport}
+\item \textbf{Range}: \texttt{dpp:ProductPassport}
+\item \textbf{Purpose}: Used when a raw material is transformed (e.g., textile yarn into a fabric roll, or raw chemical powders into a battery anode). It establishes the semantic lineage without requiring the parent passport to understand the internal chemistry of the input.
+\item \textbf{Cardinality}: Many materials may derive from one or more source materials.
+\end{itemize}
+
+\subsubsection{\texttt{dpp:massFraction} (The Quantification Attribute)}
+
+\begin{itemize}
+\item \textbf{Type}: \texttt{rdf:Property}
+\item \textbf{Range}: \texttt{xsd:decimal}
+\item \textbf{Purpose}: Declares exactly how much of the linked component's weight or mass constitutes the final product. Associated with a blank node or reified relation linking a precursor \DPP\ to its parent.
+\item \textbf{Datatype}: \texttt{xsd:decimal} (e.g., 0.42 for 42\% mass fraction).
+\end{itemize}
+
+
+\emph{Note: While the \DPP\ model is expressed in \RDF\ / \RDFS\ for maximum simplicity, the properties are compatible with OWL and can be refined to \texttt{owl:ObjectProperty} or \texttt{owl:DatatypeProperty} if \OWL\ reasoning is required for specific applications.}
+
+\subsection{\RDF\ / \JSONLD\ Representation}
+
+When serialised, the parent passport remains clean, lightweight, and completely generic. It simply maps its assembly topology. The critical insight is that the parent \DPP\ contains \textbf{no component data} --- only links. The actual composition, hazard, and provenance data for each component lives in its own \DPP, stored behind the portal. When a query engine resolves \texttt{dpp:hasPrecursor}, it follows the link \textit{within the portal's triple-store}, retrieving the component's data in real time. This design directly addresses the modularity problem raised at the conference: ``\textit{once the size is limited to a few dozens, you can still fully understand the overall data model. Once it gets to hundreds or thousands of data points, that is impossible}''~\cite{dpp4eu2026_day1}. By distributing data across linked individual \DPPs\ rather than accumulating it in a single monolithic record, the model keeps each data unit manageable and independently maintainable.
+
+\begin{lstlisting}[language=jsonld]
+{
+  "@context": "https://w3id.org/dpp/v1",
+  "@id": "urn:dpp:product:batch-2026-001",
+  "@type": "dpp:ProductPassport",
+  "dpp:productName": "Lithium-Ion Battery Pack Model X",
+  "dpp:hasPrecursor": [
+    {
+      "@id": "urn:dpp:component:cathode-batch-789",
+      "dpp:massFraction": {
+        "@value": 0.42,
+        "@type": "xsd:decimal"
+      }
+    },
+    {
+      "@id": "urn:dpp:component:anode-batch-456",
+      "dpp:massFraction": {
+        "@value": 0.28,
+        "@type": "xsd:decimal"
+      }
+    },
+    {
+      "@id": "urn:dpp:component:electrolyte-batch-123",
+      "dpp:massFraction": {
+        "@value": 0.15,
+        "@type": "xsd:decimal"
+      }
+    }
+  ],
+  "dpp:derivedFrom": {
+    "@id": "urn:dpp:material:lithium-carbonate-batch-001"
+  }
+}
+\end{lstlisting}
+
+\subsection{Each \DPP\ as a Knowledge Graph (Named Graph)}
+
+In the portal-backed architecture, each individual \DPP\ is not merely a \JSONLD\ document but a \textbf{knowledge graph} stored as an \RDF\ Named Graph within the portal's triple-store. A Named Graph is an \RDF\ graph identified by an \IRI, allowing the portal to manage each \DPP\ as a distinct, addressable unit within a larger graph database. This design has several implications.
+
+First, \textbf{independent lifecycle management}: each \DPP\ can be updated, versioned, or deprecated independently of other \DPPs. When a component manufacturer corrects a hazard classification, only that component's \DPP\ is updated; all parent product \DPPs\ that reference it via \texttt{dpp:hasPrecursor} automatically reflect the correction upon resolution, without requiring synchronised updates across the supply chain. 
+
+Second, \textbf{\SPARQL\ queryability}: because each \DPP\ is a named graph within a single triple-store, the portal can execute cross-\DPP\ \SPARQL\ queries --- for example, traversing an entire supply chain from final product to raw materials in a single query, or identifying all products containing a specific substance of concern across all \DPPs\ in the system. 
+
+Third, \textbf{access control granularity}: as discussed in Section~5, the portal can enforce \ODRL\ access policies at the level of individual named graphs or sub-graphs, providing branch-level access control that is not possible when data is scattered across distributed \ERO\ endpoints. The use of persistent \IRIs\ as graph identifiers, as emphasised in the author's honorary lecture at \DPPforEU~2026 where ``\textit{on the lowest level is the \IRI --- the international resource identifier}''~\cite{dpp4eu2026_day2}, ensures that each \DPP\ remains uniquely addressable and resolvable indefinitely.
+
+\subsection{\IRI\ as the Language-Neutral Foundation}
+
+Before a \DPP\ can be represented as a knowledge graph, its constituent entities --- products, components, materials, substances, processes, organisations --- must be unambiguously identified. The architecture adopts the International Resource Identifier (\IRI) as the lowest level of identification, as emphasised in the honorary lecture: ``\textit{on the lowest level is the \IRI --- the international resource identifier}.'' The use of \IRIs\ resolves a fundamental challenge in the European \DPP\ ecosystem: the multiplicity of natural languages across member states. As Figure~\ref{fig:iri-multilingual} illustrates, the same concept (``exit'') expressed in multiple natural languages 
+%--- 出口, Ausgang, Chūkǒu, sortie, exit, salida, uscita, thon sgo, keluar, kijárat, dalje --- 
+that
+map to a single \IRI. This principle, applied throughout the \DPP\ architecture, enables cross-lingual, cross-jurisdictional interoperability without requiring a single natural language to dominate the system.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\linewidth]{figures/2025-10-16__DigiPass_DPP_handling-IRI.pdf}
+\caption{The \IRI\ as a language-neutral identifier. The same concept (``exit'') expressed in multiple natural languages maps to a single International Resource Identifier (IRI). This principle, applied throughout the \DPP\ architecture, enables cross-lingual, cross-jurisdictional interoperability without requiring a single natural language to dominate the system. The terminology is taken from ontologies, which provide the semantic vocabulary for the \DPP\ knowledge graphs.}
+\label{fig:iri-multilingual}
+\end{figure}
+
+The terminology used in \DPP\ knowledge graphs is taken from ontologies, which provide the semantic vocabulary for the \DPP\ data. The ontologies are themselves identified by persistent \IRIs, ensuring that the meaning of \DPP\ data is unambiguously interpretable across the entire ecosystem. This layered approach --- \IRIs\ for identification, ontologies for semantics, \SHACL\ for structure --- follows the principle stated in the honorary lecture: ``\textit{everything must be ontologised}''~\cite{dpp4eu2026_day2}. The ontologisation objective is an essentially global language that is adjusted to local languages via mechanisms, while the user does not need to be confronted with regulations. The user will need to know his product, but the system handles the regulatory and semantic complexity transparently. This \IRI-based foundation directly supports the external entity normalisation stage of the Ingestion Governance Loop (Section~3.2.3): when a \DPP\ references a chemical substance, a standard, or a certificate, the portal controller normalises the reference to a canonical \IRI, ensuring consistent identification across all \DPPs\ in the triple-store.
+
+\subsection{Production as a Network: The Core Architectural Contrast}
+
+A central insight of the proposed architecture is that production is a network, not a linear chain. As stated in the honorary lecture at \DPPforEU~2026~\cite{dpp4eu2026_day2}: ``\textit{production is a network. It's at the very best case a tree. You have an awful lot of things that are being assembled into something. But it's definitely not linear}''. This observation has profound architectural consequences. The traditional approach of hardcoding a static supply chain into a single product's \DPP\ --- whether as a flat-file payload or as a blockchain record --- fundamentally misrepresents the structure of production. A flat-file \DPP\ embeds all upstream data in a single document, creating a monolithic record that is stale on creation and impossible to update consistently. A blockchain \DPP\ replicates the supply chain as an append-only ledger, creating unnecessary redundancy and immutability where dynamic updatability is required. Both approaches treat the supply chain as a linear chain; neither captures the reality that production is a network.
+
+The Networked Individual \DPP\ model proposes a fundamentally different mapping: the production network maps to a \textbf{\DPP\ graph network}, where each product in the production network has its own \DPP, and the \DPPs\ are linked via semantic properties (\texttt{dpp:hasPrecursor}, \texttt{dpp:derivedFrom}). The supply chain information is not embedded in any single \DPP; it is \textit{extracted from the \DPP\ repository by following the linked \DPPs}~\cite{dpp4eu2026_day2}. Figure~\ref{fig:product-network} shows the production network in terms of products and processes, and Figure~\ref{fig:dpp-network} shows the corresponding \DPP\ graph network.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\linewidth]{figures/2025-10-16__DigiPass_DPP_handling-process_network_flows.pdf}
+\caption{The production network in terms of products and processes. Each process (A--F) produces a product, and products flow between processes as inputs and outputs. The network is a directed acyclic graph, not a linear chain: products are assembled from multiple inputs, and a single product may be used in multiple downstream processes. Each product flow has an associated \DPP.}
+\label{fig:product-network}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\linewidth]{figures/2025-10-16__DigiPass_DPP_handling-process_network_DPP.pdf}
+\caption{The corresponding \DPP\ graph network. Each product in the production network has its own \DPP, stored as a knowledge graph behind the portal. The \DPPs\ are linked via \texttt{dpp:hasPrecursor} (assembly links) and \texttt{dpp:derivedFrom} (transformation links). The supply chain information is extracted by traversing the linked \DPPs\ within the portal's triple-store --- not by embedding it in a single monolithic record. The portal controller maintains and updates the link network as the production network evolves.}
+\label{fig:dpp-network}
+\end{figure}
+
+The contrast between the three approaches is summarised in Table~\ref{tab:approach-comparison}.
+
+\begin{table}[p]
+\centering
+\caption{Comparison of supply chain representation approaches.}
+\label{tab:approach-comparison}
+\begin{tabular}{p{0.18\textwidth} p{0.27\textwidth} p{0.27\textwidth} p{0.22\textwidth}}
+\toprule
+ & \textbf{Flat-File \DPP} & \textbf{Blockchain \DPP} & \textbf{Networked Graph \DPP\ (Proposed)} \\
+\midrule
+Supply chain model & Linear chain, embedded in single document & Linear chain, replicated as append-only ledger & Network (\DAG), represented as linked graphs \\
+\addlinespace
+Data structure & Single flat payload per product & Blockchain transaction per product & \RDF\ named graph per product, linked via semantic properties \\
+\addlinespace
+Update propagation & None --- data stale on creation & Append-only --- old data preserved, new data added & Instant --- single update to component \DPP\ propagates to all parents upon resolution \\
+\addlinespace
+Data duplication & Full duplication across all parent \DPPs & Full replication across all nodes & Zero duplication --- links, not data \\
+\addlinespace
+Query capability & Limited to single \DPP\ payload & Limited to chain traversal & Full \SPARQL\ queries across the entire \DPP\ network \\
+\addlinespace
+Access control & Binary --- full payload or nothing & Binary --- on-chain or off-chain & Granular --- branch-level \ABAC\ with \ODRL\ policies \\
+\addlinespace
+\IP\ protection & None --- all data exposed in payload & None --- all data on ledger & Branch-level filtering --- proprietary branches protected \\
+\addlinespace
+Scalability & Degrades with supply chain depth & Degrades with replication overhead & Scales --- each \DPP\ is independently manageable \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The key architectural distinction is this: in the flat-file and blockchain approaches, the supply chain is \textit{embedded} in the product's \DPP. In the networked graph approach, the supply chain is \textit{emergent} from the links between individual \DPPs. The supply chain does not exist as a stored data structure; it is constructed on demand by traversing the linked \DPPs\ within the portal's triple-store. This design also enables capabilities that neither the flat-file nor the blockchain approach can support. A \SPARQL\ query can recursively follow the \texttt{dpp:hasPrecursor} links, pull data attributes from each child graph, and compile a real-time, mathematically sound Life Cycle Assessment (\LCA)~\cite{dpp4eu2026_day2}.
+
+The \DPP\ network also captures energy flows, waste streams, and utilities. As the honorary lecture explained, each stream in the production process --- including waste and utilities --- can be associated with ``\textit{a \DPP\ or something of that kind}'', though it need not be a complete passport; what matters is that it carries ``\textit{the relevant information}''~\cite{dpp4eu2026_day2}. For some flows, such as electricity from the grid, no \DPP\ exists; instead, the \LCA\ links to \textbf{secondary data} from external lifecycle inventory databases to capture the impacts of energy production~\cite{dpp4eu2026_day2}. The combination of linked \DPPs\ for material streams and secondary data for utility flows enables comprehensive system-boundary \LCA: because the portal stores both the mass and energy data associated with each production step, a query engine can traverse the network and aggregate impacts across the entire system boundary~\cite{dpp4eu2026_day2}.
+
+
+%The key architectural distinction is this: in the flat-file and blockchain approaches, the supply chain is \textit{embedded} in the product's \DPP. In the networked graph approach, the supply chain is \textit{emergent} from the links between individual \DPPs. The supply chain does not exist as a stored data structure; it is constructed on demand by traversing the linked \DPPs within the portal's triple-store. This design also enables capabilities that neither the flat-file nor the blockchain approach can support. A \SPARQL query can recursively follow the \texttt{dpp:hasPrecursor} links, pull data attributes from each child graph, and compile a real-time, mathematically sound Life Cycle Assessment (\LCA)~\cite{dpp4eu2026_day2}. The \DPP network also captures energy flows, waste streams, and utilities --- each material stream in the production process, including waste and utilities, can have its own \DPP, enabling comprehensive system-boundary \LCA~\cite{dpp4eu2026_day2}.
+
+\subsection{Resolving the Link Rot Problem}
+
+Under the portal-backed model, because the individual graph of each component was pushed \textit{behind the portal} at the time of manufacture, the link remains entirely resolvable forever. The query engine follows the link internally within the portal archive, retrieving the necessary data fields smoothly even decades later. This is in stark contrast to the \ERO-hosted approach, where a component manufacturer going out of business would return a \texttt{404 Not Found} error when a query engine tries to resolve \texttt{dpp:hasPrecursor}. The parent product's carbon footprint calculation or material circularity calculation would fail because the component data is simply unreachable. The conference discussion on data persistency (see Section~2.1) directly motivates this design. The portal-backed architecture answers this question structurally rather than procedurally: data persists because it is stored in a governed repository, not at an unmanaged endpoint that may disappear at any time.
+
+\subsection{Resolving the Data Update and Consistency Problem}
+
+The networked model also resolves the data update problem inherent in monolithic \DPPs. In the monolithic model, if a component's data is embedded in 100 parent product \DPPs, updating the component data requires updating 100 separate \DPPs --- a logistically impossible task across organisational boundaries. In the networked model, the component data lives in exactly one place (the component's own \DPP\ behind the portal), and all 100 parent products reference it by link. A single update to the component \DPP\ propagates instantly to all parent products upon resolution. This design also addresses the concern raised at the conference about data correctness and dynamic updates: ``\textit{how we are going to solve this issue or to guarantee the sustainability and working of}'' the data over time~\cite{dpp4eu2026_day2}. The architectural answer is that the portal maintains a single authoritative copy of each \DPP, with versioning and provenance metadata, and all references resolve to the current authoritative version.

@@ -1,0 +1,49 @@
+% ===================================================================
+\section{Conclusion and Roadmap}
+% ===================================================================
+
+\subsection{Summary of Contributions}
+
+This paper has proposed a portal-backed, graph-based, network-structured \DPP\ architecture built on semantic web standards that addresses the systemic vulnerabilities of the current distributed, flat-file model. The architecture comprises six integrated components: (1)~the Networked Individual \DPP\ model with semantic linking properties (\texttt{dpp:hasPrecursor}, \texttt{dpp:derivedFrom}), in which each \DPP\ is a knowledge graph node in a production network; (2)~the portal as semantic proxy archive, storing all \DPP\ data --- including \REO\ product data --- behind a federated portal; (3)~an \ABAC\ framework with five standardised user categories and ODRL branch-level access policies, ensuring strictly controlled, granular access for protection of sensitive data; (4)~a three-pillar trust tier matrix combining \EORI\ / \VIES, \WthreeC\ Verifiable Credentials, and \eIDAS~2.0; (5)~\SHACL\ as a unified data modelling language serving both conformity checking and \GUI\ generation, supported by a \SHACL\ brick library, a two-stage design toolchain, a licensed \DPP\ application ecosystem with dual authorisation and review board, and a public repository for ontologised regulations and standards; and (6)~a cross-registry linking strategy for chemical data governance, connecting \DPPs\ to authoritative public databases rather than duplicating data. Evidence from the \DPPforEU~2026 conference --- comprising 150 in-person participants, over 1,700 online participants, and representatives of four European Commission Directorate-Generals, HaDEA, and CEN/CENELEC \JTC~24~\cite{dpp4eu2026_postconf} --- demonstrates that the constituent elements of this architecture are independently recognised as necessary by the practitioner community. This paper integrates them into a coherent whole.
+
+\subsection{The Roadmap for the European Commission}
+
+The proposed architecture aligns with a vision already anticipated within the DigiPass consortium. An internal consortium deliverable anticipated a future in which ``\textit{there is indeed a European \DPP\ Registry with: registration, \API\ access, semantic repository}'' --- a vision that maps directly onto the portal-backed architecture proposed here~\cite{dpp4eu2026_postconf}. The European Commission's funding agency has likewise recognised the need for structural coordination: Giuseppe Giovanni Daquino of HaDEA observed at \DPPforEU~2026 that the agency ``\textit{clearly identified how these projects are clustered through the \DPP\ connection with SSbD processes and its integration and strategic alignment with the European advanced materials innovation ecosystem}''~\cite{dpp4eu2026_postconf}. The federated portal architecture provides exactly this clustering and integration function at the technical level.
+
+Based on the architecture proposed in this paper, we recommend the following roadmap for the European Commission:
+
+\subsubsection{Phase 1 (2026--2027): Foundation}
+
+\begin{itemize}
+\item Adopt the federated portal specification as the architectural baseline for the \DPP\ central registry infrastructure, complementing the identifier resolution function with the portal's data storage and governance layer.
+\item Establish the public repository for ontologised regulations and standards on the \EC\ \DPP\ registry, beginning with the ESPR, the Battery Regulation, and \REACH.
+\item Pilot the portal architecture with the first product category (batteries), using the Battery Regulation requirements as the initial \SHACL\ shape library.
+\item Begin the \SHACL\ brick generation process for the battery domain, engaging domain experts and ontology engineers.
+\item Establish the review board for \SHACL\ bricks, schemas, and licensed \DPP\ applications, with a dedicated \EU\ budget line for ongoing maintenance.
+\item Define the dual authorisation framework for licensing \DPP\ application providers, involving both the European Commission and relevant professional organisations.
+\end{itemize}
+
+\subsubsection{Phase 2 (2027--2028): Expansion}
+
+\begin{itemize}
+\item Extend the portal architecture to the next product categories (textiles, construction products, electronics), generating domain-specific \SHACL\ brick libraries for each.
+\item Begin licensing the first \DPP\ application providers for the battery domain, using the \SHACL\ schemas produced in Phase~1.
+\item Deploy the federated portal across all willing \EU\ member states, with a common specification and interoperability testing.
+\item Integrate the three-pillar trust tier matrix with the \EC\ Authorisation App, leveraging \eIDAS~2.0 digital identity wallets.
+\item Begin cross-registry linking implementation, starting with ECHA for chemical hazard data and expanding to other quality infrastructure databases.
+\item Expand the licensed application ecosystem to textiles, construction products, and electronics as domain-specific \SHACL\ brick libraries become available.
+\end{itemize}
+
+\subsubsection{Phase 3 (2028--2030): Maturation}
+
+\begin{itemize}
+\item Achieve full federated portal coverage across all \EU\ member states.
+\item Complete the \SHACL\ brick library for all priority product categories under the ESPR.
+\item Establish the DigiPass Europe community entity as the ongoing custodian of the \SHACL\ brick library and the domain-specific semantic information, with \COST\ action or equivalent funding.
+\item Extend the cross-registry linking strategy to industry data platforms (Materials Commons, ChemX, sector-specific platforms).
+\item Explore extension of the portal specification to non-\EU\ countries for global \DPP\ interoperability through UN/CEFACT and \ISO/\IEC\ \JTC~5.
+\end{itemize}
+
+\subsection{The Path Forward}
+
+The conference chair's closing observation --- that ``\textit{this year's conference was very inspiring. It has stronger results. It has clearer contributions, a deeper understanding of what the passport is and what it could yet become}''~\cite{dpp4eu2026_day3} --- captures the moment. The \DPP\ community has reached a point of clarity about what is needed: semantic representations, persistent storage, granular access control, quality infrastructure integration, machine-readable regulation, and a licensed application ecosystem that makes compliance accessible to enterprises of all sizes. What is missing is the integrated architecture that combines these elements. This paper proposes such an architecture. The path forward requires the European Commission, member states, standards bodies, and the practitioner community to collaborate on its implementation --- a collaboration that the DigiPass Europe initiative, the \COST\ action, and the \JTC~24/\JTC~5 standardisation processes are well positioned to sustain.

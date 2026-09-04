@@ -1,0 +1,143 @@
+\PassOptionsToPackage{pagebackref}{hyperref}
+\documentclass[preprint,12pt]{elsarticle}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amsfonts,amssymb}
+\usepackage{url}
+\usepackage{xurl}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{lineno}
+\usepackage{listings} 
+\usepackage[utf8]{inputenc}
+\usepackage{booktabs}
+\usepackage{longtable}
+
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,    % False for boxed links, true for colored text
+    linkcolor=blue,     % Color of internal links (like TOC entries)
+    filecolor=magenta,  % Color of file links
+    urlcolor=cyan,      % Color of external website links
+    linktoc=all,        % Links both the text and page number
+    pagebackref=true % Enables backward links from bibliography to text
+}
+
+% Custom JSON language styling
+\colorlet{json_punct}{red!60!black}
+\colorlet{json_string}{blue!70!black}
+\colorlet{json_number}{orange!90!black}
+
+\lstdefinelanguage{jsonld}{
+    string=[s]{"}{"},
+    stringstyle=\color{json_string},
+    comment=[l]{//},
+    morecomment=[s]{/*}{*/},
+    commentstyle=\color{gray},
+    literate=
+     *{:}{{\textcolor{json_punct}{:}}}{1}
+      {,}{{\textcolor{json_punct}{,}}}{1}
+      {\{}{{\textcolor{json_punct}{\{}}}{1}
+      {\}}{{\textcolor{json_punct}{\}}}}{1}
+      {[}{{\textcolor{json_punct}{[}}}{1}
+      {]}{{\textcolor{json_punct}{]}}}{1},
+}
+\lstdefinelanguage{json}{
+    string=[s]{"}{"},
+    stringstyle=\color{json_string},
+    comment=[l]{//},
+    morecomment=[s]{/*}{*/},
+    commentstyle=\color{gray},
+    literate=
+     *{:}{{\textcolor{json_punct}{:}}}{1}
+      {,}{{\textcolor{json_punct}{,}}}{1}
+      {\{}{{\textcolor{json_punct}{\{}}}{1}
+      {\}}{{\textcolor{json_punct}{\}}}}{1}
+      {[}{{\textcolor{json_punct}{[}}}{1}
+      {]}{{\textcolor{json_punct}{]}}}{1},
+}
+\lstset{
+  breaklines=true,
+  breakatwhitespace=true,
+  breakautoindent=true,
+  basicstyle=\ttfamily\raggedright,
+  columns=fullflexible,
+  keepspaces=true,
+  showstringspaces=false
+}
+
+\input{hover}
+
+
+\journal{[Journal name, to be completed]}
+
+
+\begin{document}
+
+
+% \title{DPP -- The Graph of Passport Model}
+% \title{Portal-Backed Graph Architecture for Digital Product Passports: Semantic Governance and Access Control for Multi-Tiered Supply Chains}
+\title{Portal-Backed Graph Architecture for Digital Product Passports: \\
+       Semantic Governance and Access Control for Multi-Tiered Supply Chains}
+\date{July 2026}
+
+% Optional running head:
+\newcommand{\runninghead}{DPP — The Graph of Passports Model}
+
+
+\begin{frontmatter}
+\input{authors}
+
+\input{abstract}
+
+\input{keywords}
+
+
+
+\end{frontmatter}
+
+% \linenumbers
+
+\clearpage
+\tableofcontents
+\clearpage
+\input{abbreviations}
+\clearpage
+\listoffigures
+\clearpage
+
+
+
+\input{1_ESPR}
+\input{2_problem_statement}
+\input{3_Network_model}
+\input{4_portal_architecture}
+\input{5_ABAC_framework}
+\input{6_SHACL_data_modelling}
+\input{7_chemical_data_governance}
+\input{8_discussion}
+\input{9_conclusions}
+
+
+\section*{acknowledgments}
+This work is being funded by the EC's Horizon Europe research and
+innovation programme, we acknowledge GA no.~101138510 (DigiPass CSA).
+
+
+\section*{Declaration on Generative AI}
+The author(s) have not employed any Generative AI tools for analysing the conference transcripts, the post-conference report, and proofreading. 
+
+\appendix
+\input{Appendix_A}
+\clearpage
+\input{Appendix_B}
+\clearpage
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}

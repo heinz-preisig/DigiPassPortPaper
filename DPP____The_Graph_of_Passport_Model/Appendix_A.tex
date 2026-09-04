@@ -1,0 +1,229 @@
+% ===================================================================
+\appendix
+\section{Portal API Specification}
+\label{app:api-spec}
+% ===================================================================
+\setcounter{table}{0}
+
+This appendix specifies the portal \REST\ \API. All endpoints use HTTPS with TLS 1.3. Request and response bodies are \JSON\ (for management operations) or \JSONLD\ / \TURTLE\ / \RDF\ / \XML\ (for \DPP\ data). All requests except authentication require a valid bearer token in the \texttt{Authorization} header.
+
+\subsection{Authentication}
+
+\begin{table}[h]
+\centering
+\caption{Authentication endpoint.}
+\label{tab:api-auth}
+\begin{tabular}{p{0.2\textwidth} p{0.2\textwidth} p{0.55\textwidth}}
+\toprule
+\textbf{Method} & \textbf{Path} & \textbf{Description} \\
+\midrule
+POST & \texttt{/auth/token} & Exchange \eIDAS\ 2.0 credential for a bearer token. Returns a short-lived JWT containing the requester's attributes. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Request body} (\JSON):
+\begin{lstlisting}[language=json,breaklines=true,breakatwhitespace=true]
+{
+  "eidasCredential": "<\eIDAS 2.0 digital identity credential>",
+  "requestedScopes": ["dpp:read", "dpp:write"]
+}
+\end{lstlisting}
+
+\textbf{Response body} (JSON):
+\begin{lstlisting}[language=json,breaklines=true,breakatwhitespace=true]
+{
+  "accessToken": "<JWT>",
+  "tokenType": "Bearer",
+  "expiresIn": 3600,
+  "attributes": {
+    "userCategory": "dpp:ProfessionalUser",
+    "organisation": "urn:eori:DE123456789",
+    "jurisdiction": "DE",
+    "certifications": ["urn:vc:electronics-repair-cert"]
+  }
+}
+\end{lstlisting}
+
+\subsection{\DPP\ Lifecycle Management}
+
+\begin{table}[h]
+\centering
+\caption{\DPP\ lifecycle management endpoints.}
+\label{tab:api-lifecycle}
+\small
+\begin{tabular}{p{0.10\textwidth} p{0.30\textwidth} p{0.60\textwidth}}
+\toprule
+\textbf{Method} & \textbf{Path} & \textbf{Description} \\
+\midrule
+POST & \texttt{/dpps} & Submit a new \DPP. The request body is a signed JSON-LD document. Passes through the Ingestion Governance Loop. Returns the assigned \DPP\ \URI and validation report. \\
+\addlinespace
+GET & \texttt{/dpps/\{dppId\}} & Retrieve a \DPP\ by its unique identifier. Passes through the Resolution Governance Loop. Returns a filtered JSON-LD sub-graph based on the requester's access rights. \\
+\addlinespace
+PUT & \texttt{/dpps/\{dppId\}} & Update an existing \DPP. The request body is a signed JSON-LD document with the updated content. Requires \texttt{dpp:InternalDataOriginator} role. Triggers re-validation through the Ingestion Governance Loop. \\
+\addlinespace
+DELETE & \texttt{/dpps/\{dppId\}} & Revoke a \DPP. The \DPP\ is marked as revoked (not physically deleted; provenance is preserved). Requires \texttt{dpp:InternalDataOriginator} role. \\
+\addlinespace
+POST & \texttt{/dpps/\{dppId\}/register} & Register a \DPP\ with the EC central registry. Maps the \DPP\ \URI to the product unique identifier in the EC registry. Requires \texttt{dpp:InternalDataOriginator} role. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{POST /dpps --- Request body} (JSON-LD):
+\begin{lstlisting}[language=jsonld,breaklines=true,breakatwhitespace=true,columns=fullflexible]
+{
+  "@context": "https://w3id.org/dpp/v1",
+  "@id": "urn:dpp:product:batch-2026-001",
+  "@type": "dpp:ProductPassport",
+  "dpp:productName": "Lithium-Ion Battery Pack Model X",
+  "dpp:hasPrecursor": [...],
+  "dpp:derivedFrom": {...},
+  "dpp:signature": {
+    "algorithm": "RS256",
+    "value": "<base64-encoded signature>",
+    "certificate": "<X.509 certificate URI>"
+  }
+}
+\end{lstlisting}
+
+\textbf{POST /dpps --- Response body} (\JSON):
+\begin{lstlisting}[language=json,breaklines=true,breakatwhitespace=true,columns=fullflexible]
+{
+  "dppId": "urn:dpp:product:batch-2026-001",
+  "status": "accepted",
+  "validationReport": {
+    "shaclConformant": true,
+    "cryptographicVerified": true,
+    "entitiesNormalized": 14,
+    "errors": []
+  }
+}
+\end{lstlisting}
+
+\textbf{GET /dpps/\{dppId\} --- Response body} (\JSONLD, filtered):
+\begin{lstlisting}[language=jsonld,breaklines=true,breakatwhitespace=true,columns=fullflexible]
+{
+  "@context": "https://w3id.org/dpp/v1",
+  "@id": "urn:dpp:product:batch-2026-001",
+  "@type": "dpp:ProductPassport",
+  "dpp:productName": "Lithium-Ion Battery Pack Model X",
+  "dpp:hasPrecursor": [
+    {"@id": "urn:dpp:component:cathode-b789"},
+    {"@id": "urn:dpp:component:anode-b456"}
+  ],
+  "dpp:filteredBranches": ["dpp:public", "dpp:professional"]
+}
+\end{lstlisting}
+
+Note: The \texttt{dpp:filteredBranches} property is a metadata annotation added by the portal controller to indicate which branches were included in the response, enabling the client to understand what was filtered out.
+
+\subsection{Link Traversal}
+
+\begin{table}[h]
+\centering
+\caption{Link traversal endpoint.}
+\label{tab:api-links}
+\small
+\begin{tabular}{p{0.10\textwidth} p{0.35\textwidth} p{0.55\textwidth}}
+\toprule
+\textbf{Method} & \textbf{Path} & \textbf{Description} \\
+\midrule
+GET & \texttt{/dpps/\{dppId\}/precursors} & Retrieve all precursor \DPPs\ linked via \texttt{dpp:hasPrecursor}. Each linked \DPP\ is resolved through the Resolution Governance Loop and returned as a filtered subgraph. \\
+\addlinespace
+GET & \texttt{/dpps/\{dppId\}/derivations} & Retrieve all derivation \DPPs\ linked via \texttt{dpp:derivedFrom}. Each linked \DPP\ is resolved through the Resolution Governance Loop and returned as a filtered sub-graph. \\
+\addlinespace
+GET & \texttt{/dpps/\{dppId\}/supplychain} & Recursively traverse the full supply chain by following \texttt{dpp:hasPrecursor} and \texttt{dpp:derivedFrom} links. Returns an aggregated \JSONLD\ graph containing all accessible linked \DPPs, each filtered according to the requester's access rights. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{\SPARQL\ Query}
+
+\begin{table}[h]
+\centering
+\caption{\SPARQL\ query endpoint.}
+\label{tab:api-sparql}
+\small
+\begin{tabular}{p{0.10\textwidth} p{0.15\textwidth} p{0.75\textwidth}}
+\toprule
+\textbf{Method} & \textbf{Path} & \textbf{Description} \\
+\midrule
+POST & \texttt{/sparql} & Submit a \SPARQL\ CONSTRUCT or SELECT query. The portal controller executes the query with dynamic ODRL-based graph filtering: only triples from branches the requester is authorised to access are returned. The response is returned in the requested serialisation format (\JSONLD, \TURTLE, \RDF\ / \XML, or \SPARQL\ \JSON results). \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Request body} (\JSON):
+\begin{lstlisting}[language=json,breaklines=true,breakatwhitespace=true,columns=fullflexible]
+{
+  "query": "CONSTRUCT { ?s ?p ?o } \
+    WHERE { ?s ?p ?o . \
+      ?s dpp:containsSubstance \
+      <urn:echa:substance:7440-44-0> }",
+  "format": "application/ld+json"
+}
+\end{lstlisting}
+
+\textbf{Response body} (\JSONLD, filtered by access rights):
+\begin{lstlisting}[language=jsonld,breaklines=true,breakatwhitespace=true,columns=fullflexible]
+{
+  "@context": "https://w3id.org/dpp/v1",
+  "@graph": [
+    {
+      "@id": "urn:dpp:product:batch-2026-001",
+      "dpp:containsSubstance":
+        {"@id": "urn:echa:substance:7440-44-0"},
+      "dpp:productName":
+        "Lithium-Ion Battery Pack Model X"
+    }
+  ]
+}
+\end{lstlisting}
+
+\subsection{Error Handling}
+
+All error responses use standard HTTP status codes and a consistent \JSON\ error body:
+
+\begin{table}[h]
+\centering
+\caption{Error response codes.}
+\label{tab:api-errors}
+\small
+\begin{tabular}{p{0.12\textwidth} p{0.25\textwidth} p{0.58\textwidth}}
+\toprule
+\textbf{Code} & \textbf{Meaning} & \textbf{Description} \\
+\midrule
+400 & Bad Request & The request body is malformed, or the \SHACL\ validation failed. The response includes a structured validation report. \\
+\addlinespace
+401 & Unauthorised & The bearer token is missing, expired, or invalid. \\
+\addlinespace
+403 & Forbidden & The requester's attributes do not permit access to the requested resource or branch. \\
+\addlinespace
+404 & Not Found & The requested \DPP\ does not exist or has been revoked. \\
+\addlinespace
+409 & Conflict & The \DPP\ already exists (on POST) or has been modified since retrieval (on PUT). \\
+\addlinespace
+422 & Unprocessable Entity & The \DPP\ is semantically valid JSON-LD but fails \SHACL\ validation. The response includes the \SHACL\ validation report. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Error response body} (JSON):
+\begin{lstlisting}[language=json,breaklines=true,breakatwhitespace=true,columns=fullflexible]
+{
+  "error": {
+    "code": "SHACL_VALIDATION_FAILED",
+    "message": "The submitted DPP does not conform \
+      to the applicable SHACL shapes.",
+    "validationReport": [
+      {
+        "shape": "dpp:BatteryCompositionShape",
+        "property": "dpp:carbonFootprint",
+        "constraint": "sh:minCount",
+        "value": 0,
+        "expected": 1
+      }
+    ]
+  }
+}
+\end{lstlisting}

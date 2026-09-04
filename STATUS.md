@@ -23,3 +23,11 @@ The portal is now described explicitly as a **federation of national portals** â
 - Each national portal stores its own jurisdictionâ€™s DPP data in a triple-store.
 - The federation is uniform in API, data model, access governance, and SHACL validation, but operates on national data.
 - Links are materialised as persistent IRIs, so information remains resolvable independently of any single endpoint and can span the federation as well as external registries (ECHA, standards bodies, health and safety authorities).
+
+## Authors' Q&A file (completed)
+
+Set up a flat question-and-answer file for the co-authors. Each question names the author it is for, and answers are added directly underneath.
+
+- [x] Decide on a simple Q&A format with the author named in each question.
+- [x] Replace `AUTHORS.md` with `AUTHORS_Questions_Answers.md`.
+- [x] Commit and push the change.

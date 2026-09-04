@@ -12,7 +12,7 @@ Related to link rot is the broader issue of business continuity. When a company 
 
 \subsection{Cyberattack Exposure}
 
-In the distributed model, each \REO\ endpoint is a potential attack surface. \DPP\ endpoints, by design, must be publicly resolvable (at least for public data branches). This makes them visible targets for denial-of-service attacks, data tampering, and supply chain poisoning attacks. A compromised \REO\ endpoint could serve falsified \DPP\ data --- incorrect composition declarations, fabricated certificates, or altered hazard classifications. The scale of the attack surface is proportional to the number of \REOs --- potentially hundreds of thousands across the European single market. Centralised monitoring and incident response across such a distributed landscape is structurally difficult. Conference participants also raised concerns about the integrity of data carriers, with one speaker noting the need to ``\textit{make sure that whatever the code is it goes to the correct destination}'' and that ``\textit{there is a method to detect that there is a clone}''~\cite{conf_phishing}. The emphasis on offline and online verification of data carriers reflects an awareness that the current distributed architecture creates verification challenges that a centralised portal with unified cryptographic validation could address more robustly.
+In the distributed model, each \REO\ endpoint is a potential attack surface. \DPP\ endpoints, by design, must be publicly resolvable (at least for public data branches). This makes them visible targets for denial-of-service attacks, data tampering, and supply chain poisoning attacks. A compromised \REO\ endpoint could serve falsified \DPP\ data --- incorrect composition declarations, fabricated certificates, or altered hazard classifications. The scale of the attack surface is proportional to the number of \REOs --- potentially hundreds of thousands across the European single market. Centralised monitoring and incident response across such a distributed landscape is structurally difficult. Conference participants also raised concerns about the integrity of data carriers, with one speaker noting the need to ``\textit{make sure that whatever the code is it goes to the correct destination}'' and that ``\textit{there is a method to detect that there is a clone}''~\cite{conf_phishing}. The emphasis on offline and online verification of data carriers reflects an awareness that the current distributed architecture creates verification challenges that a federated portal with unified cryptographic validation could address more robustly.
 
 \subsection{Intellectual Property Leakage}
 
@@ -40,7 +40,7 @@ Link rot & Each \REO\ is a single point of failure; data decays over time & Port
 \addlinespace
 Business continuity & \DPP\ data lost when \REO\ ceases operations & \DPP\ data persists in portal; independent of \REO\ lifecycle \\
 \addlinespace
-Cyberattack exposure & Hundreds of thousands of endpoints, each a target & Centralised portal with unified security posture \\
+Cyberattack exposure & Hundreds of thousands of endpoints, each a target & Federated portal with unified security posture \\
 \addlinespace
 \IP\ leakage & Binary access --- full payload or nothing & Branch-level \ABAC\ with \ODRL\ policies; selective visibility \\
 \addlinespace

@@ -4,7 +4,7 @@
 
 \subsection{The Portal as Semantic Proxy Archive}
 
-The central architectural proposal of this paper is that all \DPP\ data --- including product data originally provided by the Responsible Economic Operator (REO) --- is stored and maintained \textit{behind a federated portal}, rather than at distributed \ERO\ endpoints. The portal acts as a \textbf{semantic proxy archive}: a centralised triple-store that ingests, validates, stores, and serves \DPP\ data as \RDF\ named graphs. Figure~\ref{fig:app-mech} provides a conceptual overview of the full architecture, showing the relationships between the federated repository, the ontologised regulations and \SHACL\ brick library, the federated controller and portal, and the tailored app generation pipeline.
+The central architectural proposal of this paper is that all \DPP\ data --- including product data originally provided by the Responsible Economic Operator (REO) --- is stored and maintained \textit{behind a federated portal}, rather than at distributed \ERO\ endpoints. The portal acts as a \textbf{semantic proxy archive}: a federation of per-member-state triple-stores --- one per \EU\ member state --- that collectively ingest, validate, store, and serve \DPP\ data as \RDF\ named graphs. Each national instance behaves identically in terms of \API, data model, and access governance, while operating on the data relevant to economic operators registered in that jurisdiction. Figure~\ref{fig:app-mech} provides a conceptual overview of the full architecture, showing the relationships between the federated repository, the ontologised regulations and \SHACL\ brick library, the federated controller and portal, and the tailored app generation pipeline.
 
 \begin{figure}[htbp]
 \centering
@@ -13,9 +13,11 @@ The central architectural proposal of this paper is that all \DPP\ data --- incl
 \label{fig:app-mech}
 \end{figure}
 
-This design places the responsibility for sustainable, long-term data custody with a single identifiable entity --- the portal operator --- rather than dispersing it across hundreds of thousands of \EROs\ whose operational continuity cannot be guaranteed over the decades-long lifespan envisioned for \DPP\ data. The portal is not merely a registry that maps identifiers to external endpoints; it is the authoritative repository of the \DPP\ data itself. The \EC\ central registry, whose implementing act was identified by the European Commission representative at \DPPforEU~2026 as the first piece of legislation to be adopted~\cite{dpp4eu2026_day1}, provides the identifier resolution and regulatory framework, while the portal provides the data storage and governance layer. The two are complementary: the registry points to the portal, and the portal serves the data.
+This design places the responsibility for sustainable, long-term data custody with a clearly identifiable entity per jurisdiction --- the national portal operator --- rather than dispersing it across hundreds of thousands of \EROs\ whose operational continuity cannot be guaranteed over the decades-long lifespan envisioned for \DPP\ data. Each national portal instance is not merely a registry that maps identifiers to external endpoints; it is the authoritative repository of the \DPP\ data for economic operators registered in that jurisdiction. The \EC\ central registry, whose implementing act was identified by the European Commission representative at \DPPforEU~2026 as the first piece of legislation to be adopted~\cite{dpp4eu2026_day1}, provides the identifier resolution and regulatory framework, while the portal provides the data storage and governance layer. The two are complementary: the registry points to the portal, and the portal serves the data.
 
-The federated portal model envisions one portal per \EU\ member state, each behaving identically in terms of \API, data model, and access governance, but operating on data relevant to economic operators registered in that jurisdiction. This federation addresses sovereignty concerns while maintaining architectural uniformity. A federated portal with a common specification provides a unified architectural baseline that proactively addresses the emergence of parallel approaches across jurisdictions, as called for by a JTC~24 conference participant.
+\subsection{Federation of National Portals}
+
+The federated portal model envisions one portal per \EU\ member state, each behaving identically in terms of \API, data model, and access governance, but operating on data relevant to economic operators registered in that jurisdiction. Thus, the portal is not a single central server: it is a federation of interoperable national portals, each storing and governing the \DPP\ data of economic operators registered in its jurisdiction. This federation addresses sovereignty concerns while maintaining architectural uniformity. A common portal specification provides a unified architectural baseline that proactively addresses the emergence of parallel approaches across jurisdictions, as called for by a JTC~24 conference participant.
 
 \subsection{The Ingestion Governance Loop}
 
@@ -25,7 +27,7 @@ When an \REO\ submits \DPP\ data to the portal, the data passes through an \text
 
 The first stage of ingestion is validation against \SHACL\ shapes. \SHACL\ (Shapes Constraint Language) is a W3C standard for describing and validating \RDF\ graphs against a set of structural constraints called ``shapes.'' The portal controller maintains a library of \SHACL\ shapes --- one set for each product category and applicable regulation --- and validates every submitted \DPP\ against the shapes corresponding to its product type and regulatory context. If validation fails, the \DPP\ is rejected with a structured error report indicating which shapes were violated and which data points failed. 
 This design directly addresses the conference observation that machine-readable product data must become checkable by machine-readable regulation (see Section~6.2 for a detailed discussion of \SHACL\ conformity checking).
-The portal-backed architecture makes this a present capability by hosting both the \DPP\ data and the \SHACL\ validation shapes in a single triple-store, enabling automated compliance checking at ingestion time.
+The portal-backed architecture makes this a present capability by hosting both the \DPP\ data and the \SHACL\ validation shapes in a unified triple-store within each national portal instance, enabling automated compliance checking at ingestion time.
 
 \subsubsection{Cryptographic Alignment}
 
@@ -65,7 +67,7 @@ The portal-backed architecture is complementary to, not competitive with, the \E
 The portal provides:
 
 \begin{itemize}
-\item \textbf{Data storage}: hosting \DPP\ named graphs in the triple-store.
+\item \textbf{Data storage}: hosting \DPP\ named graphs in a per-member-state triple-store.
 \item \textbf{Ingestion governance}: \SHACL\ validation, cryptographic alignment, entity normalisation.
 \item \textbf{Resolution governance}: \ABAC-based graph slicing, \SPARQL\ CONSTRUCT filtering.
 \item \textbf{Link traversal}: resolving \texttt{dpp:hasPrecursor} and \texttt{dpp:derivedFrom} within the portal.

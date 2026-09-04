@@ -1,0 +1,23 @@
+# Project status
+
+## Portal architecture clarity (completed)
+
+The portal is now described explicitly as a **federation of national portals** — one per EU member state, sharing a common API and data model — rather than a single central service.
+
+- [x] Clarify the opening of Section 4 with an explicit federated-portal definition.
+- [x] Replace the "centralised triple-store" wording with a federation description.
+- [x] Add a dedicated `Federation of National Portals` subsection.
+- [x] Ensure the abstract and conclusions reflect the federated concept.
+- [x] Commit and push the final changes.
+
+## What changed
+
+- `4_portal_architecture.tex`: added `Federation of National Portals` subsection and replaced "centralised triple-store" with a federation of per-member-state triple-stores.
+- `1_ESPR.tex`, `2_problem_statement.tex`, `3_Network_model.tex`, `8_discussion.tex`: replaced remaining "centralised" descriptions of the portal with "federated" wording.
+- `abstract.tex` and `9_conclusions.tex`: now explicitly state the portal is a federation of national portals, one per EU member state.
+
+## Notes
+
+- The EU central registry provides identifier resolution, regulatory metadata, and oversight.
+- Each national portal stores its own jurisdiction’s DPP data in a triple-store.
+- The federation is uniform in API, data model, access governance, and SHACL validation, but operates on national data.

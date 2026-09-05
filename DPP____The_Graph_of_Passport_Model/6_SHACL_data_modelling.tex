@@ -162,7 +162,10 @@ the most current regulatory requirements.
 The \SHACL-driven architecture creates a new category of economic actor:
 \textbf{licensed \DPP\ application providers} --- software businesses that
 specialise in building, maintaining, and distributing regulation-compliant \DPP\
-generation and maintenance applications for specific product domains. For large
+generation and maintenance applications for specific product domains. Rather
+than monolithic \DPP\ platforms, these are lightweight, domain-specific
+applications generated directly from the regulation-conformant \SHACL\ schemas
+assembled by the schema assembler. For large
 companies, the \DPP\ task may be handled as part of their internal
 digitalisation programme; for smaller businesses, however, generating a \DPP\
 can be very costly in terms of the time required to learn about the regulations
@@ -250,7 +253,10 @@ as has been done in our project to automatically generate a form for manual data
 ingest}''~\cite{dpp4eu2026_day2}. The licensed \DPP\ application ecosystem
 operationalises this dual-use capability as a guarantee: the same shapes that
 validate at the portal generate the forms at the point of data entry, ensuring
-that data is ``born compliant'' (Section~6.3).
+that data is ``born compliant'' (Section~6.3). This is why the architecture
+favours lightweight, domain-specific apps over monolithic platforms: only
+applications generated from the same \SHACL\ shapes that govern portal ingestion
+can offer a structural guarantee of compliance.
 
 \subsubsection{Portal \API\ Integration}
 
